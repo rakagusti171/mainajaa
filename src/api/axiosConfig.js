@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 // Pastikan Anda sudah menginstall library ini:
 // npm install jwt-decode dayjs
 
-const baseURL = 'http://127.0.0.1:8000/api/';
+const baseURL = import.meta.env.VITE_API_URL;
 
 const apiClient = axios.create({
   baseURL: baseURL,
@@ -56,5 +56,6 @@ apiClient.interceptors.request.use(async (config) => {
     return Promise.reject(refreshError);
   }
 });
+
 
 export default apiClient;

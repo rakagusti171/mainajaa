@@ -1,4 +1,3 @@
-// frontend/src/pages/TopUpPaymentPage.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
@@ -21,41 +20,37 @@ function TopUpPaymentPage() {
   // State untuk kupon
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null); // Menyimpan info kupon valid
+  const [appliedCoupon, setAppliedCoupon] = useState(null); 
   const [finalPrice, setFinalPrice] = useState(0);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   // State untuk proses pembayaran
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  // 1. Ambil detail produk & data dari URL
   useEffect(() => {
-    // Ambil data game ID dari URL
     const uid = searchParams.get('uid');
     const zid = searchParams.get('zid');
     const nick = searchParams.get('nick');
 
     if (!uid || !nick) {
       toast.error("Informasi User ID tidak lengkap.");
-      navigate('/top-up'); // Kembali jika data URL tidak lengkap
+      navigate('/top-up');
       return;
     }
     setGameUserId(uid);
-    setGameZoneId(zid || ''); // zid bisa null
+    setGameZoneId(zid || ''); 
     setNickname(nick);
 
     const fetchProductDetails = async () => {
       try {
         setLoading(true);
-        // --- PERBAIKAN PATH API PRODUK ---
         const res = await apiClient.get(`/topup-products/${productId}/`);
-        // --- SELESAI ---
         setProduct(res.data);
-        setFinalPrice(parseFloat(res.data.harga)); // Set harga awal
+        setFinalPrice(parseFloat(res.data.harga)); 
       } catch (error) {
         console.error("Gagal memuat detail produk:", error);
         toast.error("Gagal memuat detail produk.");
-        navigate('/top-up'); // Kembali jika produk tidak ditemukan
+        navigate('/top-up'); 
       } finally {
         setLoading(false);
       }
@@ -63,29 +58,25 @@ function TopUpPaymentPage() {
 
     fetchProductDetails();
 
-    // Load Midtrans Snap script
     const script = document.createElement('script');
-    script.src = settings.MIDTRANS_SNAP_URL; // Gunakan URL dari settings
-    script.setAttribute('data-client-key', settings.MIDTRANS_CLIENT_KEY); // Gunakan client key
+    script.src = settings.MIDTRANS_SNAP_URL; 
+    script.setAttribute('data-client-key', settings.MIDTRANS_CLIENT_KEY);
     script.async = true;
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script); // Cleanup script saat unmount
+      document.body.removeChild(script); 
     };
-  }, [productId, searchParams, navigate]); // Tambah navigate sbg dependency
+  }, [productId, searchParams, navigate]); 
 
-  // 2. Fungsi validasi kupon (PERBAIKAN PATH API KUPON)
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
     setIsApplyingCoupon(true);
     setCouponError('');
-    setAppliedCoupon(null); // Reset kupon
+    setAppliedCoupon(null); 
 
     try {
-        // --- PERBAIKAN PATH API KUPON ---
         const response = await apiClient.post('/validate-coupon-topup/', {
-        // --- SELESAI ---
             kode_kupon: couponCode,
             product_id: productId,
         });
@@ -95,19 +86,18 @@ function TopUpPaymentPage() {
             toast.success(`Kupon ${response.data.kode_kupon} diterapkan!`);
         } else {
              setCouponError(response.data.error || 'Kupon tidak valid.');
-             setFinalPrice(parseFloat(product.harga)); // Kembalikan harga asli
+             setFinalPrice(parseFloat(product.harga));
         }
     } catch (error) {
         console.error("Gagal validasi kupon:", error.response?.data);
         setCouponError(error.response?.data?.error || 'Gagal menerapkan kupon.');
-        setFinalPrice(parseFloat(product.harga)); // Kembalikan harga asli
+        setFinalPrice(parseFloat(product.harga)); 
         toast.error(error.response?.data?.error || 'Gagal menerapkan kupon.');
     } finally {
         setIsApplyingCoupon(false);
     }
   };
 
-  // 3. Fungsi proses pembayaran (membuat transaksi & buka Snap)
   const handlePayment = async () => {
     if (!user) {
         toast.error("Anda harus login untuk membayar.");
@@ -116,12 +106,11 @@ function TopUpPaymentPage() {
     }
     setIsProcessingPayment(true);
     try {
-      // Panggil API create_topup_pembelian (path sudah benar sebelumnya)
       const res = await apiClient.post('/pembelian/create-topup/', {
         produk_id: productId,
         game_user_id: gameUserId,
-        game_zone_id: gameZoneId || null, // Kirim null jika kosong
-        kode_kupon: appliedCoupon ? appliedCoupon.kode_kupon : null, // Kirim kode kupon jika valid
+        game_zone_id: gameZoneId || null, 
+        kode_kupon: appliedCoupon ? appliedCoupon.kode_kupon : null, 
       });
 
       const midtransToken = res.data.midtrans_token;
@@ -130,7 +119,7 @@ function TopUpPaymentPage() {
         window.snap.pay(midtransToken, {
           onSuccess: (result) => {
             toast.success("Pembayaran berhasil!");
-            navigate('/profil'); // Arahkan ke riwayat
+            navigate('/profil'); 
           },
           onPending: (result) => {
             toast("Menunggu pembayaran Anda!", { icon: '⏳' });
@@ -141,8 +130,6 @@ function TopUpPaymentPage() {
           },
           onClose: () => {
             toast.info("Anda menutup popup pembayaran.");
-            // Refresh halaman atau arahkan ke riwayat pending?
-            // navigate('/profil'); // Arahkan ke riwayat untuk lihat status PENDING
           }
         });
       } else {
@@ -164,7 +151,6 @@ function TopUpPaymentPage() {
     <div className="container mx-auto px-6 py-8">
       <h1 className="text-3xl font-bold text-white mb-8">Checkout Top Up</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Kolom Kiri: Ringkasan Pesanan */}
         <div className="md:col-span-1">
           <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-3">
             <h2 className="text-xl font-semibold text-white mb-4">Ringkasan Pesanan</h2>
@@ -187,11 +173,9 @@ function TopUpPaymentPage() {
           </div>
         </div>
 
-        {/* Kolom Kanan: Metode Pembayaran & Kupon */}
         <div className="md:col-span-2">
           <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
             <h2 className="text-xl font-semibold text-white mb-4">Metode Pembayaran</h2>
-            {/* Input Kupon */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-1">Kode Kupon (Opsional)</label>
               <div className="flex gap-2">
@@ -219,7 +203,6 @@ function TopUpPaymentPage() {
               )}
             </div>
 
-            {/* Rincian Harga */}
             <div className="border-t border-gray-700 pt-4 space-y-2">
                {appliedCoupon && (
                  <div className="flex justify-between text-gray-300">
@@ -239,7 +222,6 @@ function TopUpPaymentPage() {
                </div>
             </div>
 
-            {/* Tombol Bayar */}
             <button
               onClick={handlePayment}
               disabled={loading || isProcessingPayment}
@@ -254,10 +236,10 @@ function TopUpPaymentPage() {
   );
 }
 
-// Tambahkan definisi settings jika belum ada
+
 const settings = {
-    MIDTRANS_SNAP_URL: import.meta.env.VITE_MIDTRANS_SNAP_URL || 'https://app.sandbox.midtrans.com/snap/snap.js', // Default ke sandbox
-    MIDTRANS_CLIENT_KEY: import.meta.env.VITE_MIDTRANS_CLIENT_KEY || 'SB-Mid-client-...' // Ganti dengan Client Key Anda
+    MIDTRANS_SNAP_URL: import.meta.env.VITE_MIDTRANS_SNAP_URL || 'https://app.sandbox.midtrans.com/snap/snap.js', 
+    MIDTRANS_CLIENT_KEY: import.meta.env.VITE_MIDTRANS_CLIENT_KEY || 'Mid-client-r8ldgd1g7C1ZM_1M' 
 };
 
 export default TopUpPaymentPage;

@@ -1,4 +1,3 @@
-// frontend/src/pages/ProfilPage.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
@@ -6,19 +5,16 @@ import AuthContext from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
-// --- (A) Definisikan Midtrans Settings ---
 const settings = {
     MIDTRANS_SNAP_URL: import.meta.env.VITE_MIDTRANS_SNAP_URL || 'https://app.sandbox.midtrans.com/snap/snap.js',
     MIDTRANS_CLIENT_KEY: import.meta.env.VITE_MIDTRANS_CLIENT_KEY || 'GANTI_DENGAN_CLIENT_KEY_ANDA'
 };
 
-// --- (B) Komponen Helper ---
 const formatHarga = (harga) => `Rp ${parseFloat(harga).toLocaleString('id-ID')}`;
 const formatTanggal = (tanggal) => new Date(tanggal).toLocaleDateString('id-ID', {
     day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
 });
 
-// Helper baru untuk tanggal bergabung
 const formatJoinDate = (isoString) => {
     if (!isoString) return 'Tidak diketahui';
     return new Date(isoString).toLocaleDateString('id-ID', {
@@ -43,7 +39,6 @@ const StatusBadge = ({ status }) => {
     );
 };
 
-// --- (C) Konten Tab: Profil Saya (VERSI BARU) ---
 const ProfilSayaTab = () => {
     const { user } = useContext(AuthContext);
     console.log("Data User dari AuthContext:", user);
@@ -71,10 +66,7 @@ const ProfilSayaTab = () => {
     );
 };
 
-// --- (D) Konten Tab: Riwayat Pembelian ---
 const RiwayatPembelianTab = () => {
-    // ... (Kode untuk RiwayatPembelianTab SAMA PERSIS seperti sebelumnya) ...
-    // (Tidak perlu disalin ulang jika sudah ada)
     const [riwayat, setRiwayat] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -100,7 +92,7 @@ const RiwayatPembelianTab = () => {
             window.snap.pay(token, {
                 onSuccess: (result) => {
                     toast.success("Pembayaran berhasil!");
-                    navigate(0); // Refresh halaman untuk update status
+                    navigate(0); 
                 },
                 onPending: (result) => {
                     toast("Menunggu pembayaran Anda!", { icon: '⏳' });
@@ -167,10 +159,7 @@ const RiwayatPembelianTab = () => {
     );
 };
 
-// --- (E) Konten Tab: Akun Favorit ---
 const AkunFavoritTab = () => {
-    // ... (Kode untuk AkunFavoritTab SAMA PERSIS seperti sebelumnya) ...
-    // (Tidak perlu disalin ulang jika sudah ada)
     const [favorit, setFavorit] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -218,10 +207,7 @@ const AkunFavoritTab = () => {
     );
 };
 
-// --- (F) Konten Tab: Ubah Password ---
 const UbahPasswordTab = () => {
-    // ... (Kode untuk UbahPasswordTab SAMA PERSIS seperti sebelumnya) ...
-    // (Tidak perlu disalin ulang jika sudah ada)
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -297,14 +283,11 @@ const UbahPasswordTab = () => {
     );
 };
 
-// --- (G) Komponen UTAMA: ProfilPage ---
 function ProfilPage() {
-    // Set default tab kembali ke 'riwayat' jika Anda mau, atau 'profil'
     const [activeTab, setActiveTab] = useState('profil'); 
     const { user, logoutUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    // Load Midtrans Snap script
     useEffect(() => {
         let scriptAdded = false;
         const script = document.createElement('script');
@@ -330,11 +313,10 @@ function ProfilPage() {
         navigate('/');
     };
 
-    // --- RENDER CONTENT (DIPERBARUI) ---
     const renderContent = () => {
         switch (activeTab) {
             case 'profil':
-                return <ProfilSayaTab />; // <-- GANTI KE KOMPONEN BARU
+                return <ProfilSayaTab />;
             case 'riwayat':
                 return <RiwayatPembelianTab />;
             case 'favorit':
@@ -345,7 +327,6 @@ function ProfilPage() {
                 return null;
         }
     };
-    // --- SELESAI DIPERBARUI ---
 
     const TabButton = ({ tabName, label }) => (
         <button
@@ -380,7 +361,6 @@ function ProfilPage() {
                     </div>
                 </div>
 
-                {/* Kolom Kanan: Konten Tab */}
                 <div className="md:col-span-3">
                     <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 min-h-[300px]">
                         {renderContent()}

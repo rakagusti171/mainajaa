@@ -1,4 +1,3 @@
-// frontend/src/pages/ForgotPasswordPage.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
@@ -7,7 +6,7 @@ import { toast } from 'react-hot-toast';
 function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(''); // Untuk pesan sukses
+  const [message, setMessage] = useState(''); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,12 +15,10 @@ function ForgotPasswordPage() {
 
     try {
       const res = await apiClient.post('/password-reset/', { email });
-      // Kita selalu tampilkan pesan sukses, apa pun responsnya (demi keamanan)
       setMessage(res.data.success || 'Jika email terdaftar, link reset telah dikirim.');
       toast.success('Permintaan reset terkirim!');
-      setEmail(''); // Kosongkan field
+      setEmail(''); 
     } catch (err) {
-      // Bahkan jika error, kita tampilkan pesan 'sukses' generik
       setMessage('Jika email terdaftar, link reset telah dikirim.');
     } finally {
       setLoading(false);

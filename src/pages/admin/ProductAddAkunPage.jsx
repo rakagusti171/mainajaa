@@ -1,15 +1,14 @@
-// frontend/src/pages/admin/ProductAddAkunPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../api/axiosConfig';
 import { toast } from 'react-hot-toast';
-import { GAME_CHOICES } from '../../utils/gameConstants'; // Impor daftar game
+import { GAME_CHOICES } from '../../utils/gameConstants'; 
 
 function ProductAddAkunPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nama_akun: '',
-    game: GAME_CHOICES[0], // Set default ke game pertama
+    game: GAME_CHOICES[0], 
     level: '',
     harga: '',
     deskripsi: '',

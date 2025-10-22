@@ -7,7 +7,6 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Statistik ini bisa dibuat dinamis nanti jika perlu
   const stats = {
     akunTerjual: '15,000+',
     kepuasan: '98%',
@@ -17,9 +16,7 @@ function HomePage() {
   useEffect(() => {
     const fetchLandingData = async () => {
       try {
-        // Ambil semua akun dari API
         const response = await apiClient.get('/accounts/');
-        // Untuk sekarang, kita anggap akun pertama adalah akun unggulan
         if (response.data && response.data.length > 0) {
           setAkunUnggulan(response.data[0]);
         }
@@ -36,10 +33,6 @@ function HomePage() {
   return (
     <div className="container mx-auto px-6 py-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-
-        {/* ================================== */}
-        {/* KOLOM KIRI: TEKS & CTA         */}
-        {/* ================================== */}
         <div>
           <span className="inline-block bg-purple-600/20 text-purple-300 text-sm font-semibold px-4 py-1 rounded-full">
             TERPERCAYA

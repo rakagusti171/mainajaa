@@ -1,4 +1,3 @@
-// frontend/src/pages/admin/CouponAddPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../api/axiosConfig';
@@ -9,7 +8,7 @@ function CouponAddPage() {
   const [formData, setFormData] = useState({
     kode: '',
     diskon_persen: '',
-    aktif: true, // Default aktif
+    aktif: true, 
   });
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +55,7 @@ function CouponAddPage() {
             required
             maxLength="20"
             placeholder="Contoh: DISKONBARU"
-            className="w-full mt-1 bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-gray-200 uppercase" // uppercase input
+            className="w-full mt-1 bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-gray-200 uppercase"
           />
            <p className="text-xs text-gray-400 mt-1">Hanya huruf dan angka, tanpa spasi. Akan disimpan dalam huruf besar.</p>
         </div>

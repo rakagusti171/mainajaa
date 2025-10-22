@@ -1,9 +1,7 @@
-// frontend/src/pages/ReviewPage.jsx
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 
-// Komponen Bintang
 const StarIcon = ({ filled, onClick }) => (
   <svg 
     className={`w-10 h-10 cursor-pointer ${filled ? 'text-yellow-400' : 'text-gray-600'}`} 
@@ -48,7 +46,6 @@ function ReviewPage() {
       <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
         <h1 className="text-3xl font-bold text-white mb-6">Beri Ulasan</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Rating Bintang */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Rating Anda</label>
             <div className="flex space-x-1">
@@ -62,7 +59,6 @@ function ReviewPage() {
             </div>
           </div>
 
-          {/* Komentar Ulasan */}
           <div>
             <label className="block text-sm font-medium text-gray-300">Ulasan Anda (Opsional)</label>
             <textarea

@@ -1,4 +1,3 @@
-// frontend/src/pages/admin/ProductAddChoicePage.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 

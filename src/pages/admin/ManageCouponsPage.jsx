@@ -1,4 +1,3 @@
-// frontend/src/pages/admin/ManageCouponsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../../api/axiosConfig';
@@ -13,7 +12,6 @@ function ManageCouponsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 1. Fetch semua kupon
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
@@ -31,26 +29,19 @@ function ManageCouponsPage() {
     fetchCoupons();
   }, []);
 
-  // 2. Fungsi untuk toggle status aktif
   const handleToggleActive = async (id) => {
     try {
-      // Optimistic UI update: ubah state dulu
       const originalCoupons = [...coupons];
       setCoupons(currentCoupons =>
         currentCoupons.map(coupon =>
           coupon.id === id ? { ...coupon, aktif: !coupon.aktif } : coupon
         )
       );
-
-      // Panggil API
       await apiClient.post(`/admin/coupon/${id}/toggle-active/`);
       toast.success('Status kupon berhasil diubah.');
-      // Tidak perlu fetch ulang karena UI sudah diupdate
 
     } catch (err) {
       toast.error('Gagal mengubah status kupon.');
-      // Rollback jika gagal
-      // setCoupons(originalCoupons); // Uncomment jika perlu rollback
     }
   };
 
@@ -68,8 +59,6 @@ function ManageCouponsPage() {
           + Tambah Kupon Baru
         </Link>
       </div>
-
-      {/* Tabel Kupon */}
       <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-gray-800">
@@ -106,7 +95,6 @@ function ManageCouponsPage() {
                     >
                       {coupon.aktif ? 'Nonaktifkan' : 'Aktifkan'}
                     </button>
-                    {/* <button className="ml-4 text-purple-400 hover:text-purple-300">Edit</button> Kita skip edit full */}
                   </td>
                 </tr>
               ))

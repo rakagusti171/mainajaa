@@ -1,8 +1,7 @@
-// frontend/src/pages/admin/DashboardHomePage.jsx
 import React, { useState, useEffect } from 'react';
-import apiClient from '../../api/axiosConfig'; // Path: ../../
+import apiClient from '../../api/axiosConfig'; 
 
-// Komponen Kartu Statistik
+
 const StatCard = ({ title, value, loading }) => (
   <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
     <h3 className="text-sm font-medium text-gray-400 uppercase">{title}</h3>
@@ -12,7 +11,6 @@ const StatCard = ({ title, value, loading }) => (
   </div>
 );
 
-// Helper format Rupiah
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -30,7 +28,6 @@ function DashboardHomePage() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        // Panggil API baru kita
         const res = await apiClient.get('/admin/dashboard-stats/');
         setStats(res.data);
       } catch (err) {
@@ -49,7 +46,6 @@ function DashboardHomePage() {
     <div className="p-8">
       <h1 className="text-3xl font-bold text-white mb-6">Dashboard</h1>
       
-      {/* Grid untuk 4 Kartu Statistik */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Pendapatan"
@@ -72,9 +68,6 @@ function DashboardHomePage() {
           loading={loading}
         />
       </div>
-
-      {/* Anda bisa menambahkan tabel atau chart lain di sini nanti */}
-      
     </div>
   );
 }

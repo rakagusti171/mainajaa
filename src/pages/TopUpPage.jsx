@@ -1,4 +1,3 @@
-// frontend/src/pages/TopUpPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
@@ -8,18 +7,14 @@ function TopUpPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- 1. Tambahkan state untuk filter ---
   const [filterGame, setFilterGame] = useState('semua');
   
-  // --- 2. Definisikan daftar game (sama seperti di SemuaAkunPage) ---
   const games = ['semua', 'Mobile Legends', 'PUBG Mobile', 'Lainnya'];
 
-  // --- 3. Perbarui useEffect ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        // Kirim 'filterGame' sebagai query parameter
         const res = await apiClient.get('/topup-products/', {
           params: { 
             game: filterGame 
@@ -34,7 +29,7 @@ function TopUpPage() {
       }
     };
     fetchProducts();
-  }, [filterGame]); // useEffect akan dijalankan ulang setiap kali filterGame berubah
+  }, [filterGame]); 
 
   const formatHarga = (harga) => `Rp ${parseFloat(harga).toLocaleString('id-ID')}`;
 
@@ -45,7 +40,6 @@ function TopUpPage() {
     <div className="container mx-auto px-6 py-8">
       <h1 className="text-3xl font-bold text-white mb-8">Top Up Game</h1>
 
-      {/* --- 4. Tambahkan elemen dropdown filter --- */}
       <div className="mb-6">
         <select 
           value={filterGame} 
@@ -57,7 +51,6 @@ function TopUpPage() {
           ))}
         </select>
       </div>
-      {/* --- Selesai --- */}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {products.length > 0 ? (

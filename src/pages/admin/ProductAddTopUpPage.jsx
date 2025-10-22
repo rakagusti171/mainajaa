@@ -1,4 +1,3 @@
-// frontend/src/pages/admin/ProductAddTopUpPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../api/axiosConfig';
@@ -7,7 +6,7 @@ import { toast } from 'react-hot-toast';
 function ProductAddTopUpPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    game: 'Mobile Legends', // Default
+    game: 'Mobile Legends',
     nama_paket: '',
     harga: '',
   });

@@ -1,4 +1,3 @@
-// frontend/src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -8,7 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 
-// Route Guards (Mengimpor dari folder 'components' Anda)
+// Route Guards
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 
@@ -23,7 +22,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import TopUpPage from './pages/TopUpPage';
 import TopUpDetailPage from './pages/TopUpDetailPage';
 
-// Halaman User (Protected)
+// Halaman User
 import ProfilePage from './pages/ProfilePage';
 import FavoritPage from './pages/FavoritPage';
 import PaymentPage from './pages/PaymentPage';
@@ -31,7 +30,7 @@ import PurchaseDetailPage from './pages/PurchaseDetailPage';
 import ReviewPage from './pages/ReviewPage';
 import TopUpPaymentPage from './pages/TopUpPaymentPage';
 
-// Halaman Admin (Protected)
+// Halaman Admin 
 import DashboardHomePage from './pages/admin/DashboardHomePage';
 import ManageOrdersPage from './pages/admin/ManageOrdersPage';
 import ManageProductsPage from './pages/admin/ManageProductsPage';
@@ -70,7 +69,7 @@ function App() {
           }}
         />
         <Routes>
-          {/* --- Rute Publik & User (Dengan Navbar/Footer) --- */}
+          {/*R ute Publik & User */}
           <Route path="/" element={<Layout />}>
             
             {/* Rute Publik */}
@@ -84,23 +83,19 @@ function App() {
             <Route path="top-up" element={<TopUpPage />} />
             <Route path="top-up/:productId" element={<TopUpDetailPage />} />
 
-            {/* Rute User yang Dilindungi (Perlu Login) */}
-            {/* Semua rute di dalam sini akan dicek oleh PrivateRoute */}
+            {/* Rute User (Harus Login) */}
             <Route element={<PrivateRoute />}>
               <Route path="profil" element={<ProfilePage />} />
               <Route path="favorit" element={<FavoritPage />} />
               <Route path="bayar/:accountId" element={<PaymentPage />} />
               <Route path="top-up/bayar/:productId" element={<TopUpPaymentPage />} />
               <Route path="profil/pesanan/:kodeTransaksi" element={<PurchaseDetailPage />} />
-              {/* Path di bawah ini mungkin duplikat, saya satukan di atas */}
-              {/* <Route path="pembelian/:purchaseId/detail" element={<PurchaseDetailPage />} /> */}
               <Route path="pembelian/:purchaseId/ulasan" element={<ReviewPage />} />
             </Route>
 
           </Route>
           
-          {/* --- Rute Admin (Layout Terpisah & Terjaga) --- */}
-          {/* Semua rute di dalam sini akan dicek oleh AdminRoute */}
+          {/* Rute Admin  */}
           <Route element={<AdminRoute />}>
             <Route path="/dashboard" element={<AdminLayout />}>
               <Route index element={<DashboardHomePage />} />

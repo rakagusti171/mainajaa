@@ -1,11 +1,10 @@
-// frontend/src/pages/ResetPasswordPage.jsx
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 import { toast } from 'react-hot-toast';
 
 function ResetPasswordPage() {
-  const { uid, token } = useParams(); // Ambil uid dan token dari URL
+  const { uid, token } = useParams(); 
   const navigate = useNavigate();
 
   const [password, setPassword] = useState('');

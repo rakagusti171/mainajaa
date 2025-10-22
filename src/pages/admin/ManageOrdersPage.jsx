@@ -1,14 +1,11 @@
-// frontend/src/pages/admin/ManageOrdersPage.jsx
 import React, { useState, useEffect } from 'react';
-import apiClient from '../../api/axiosConfig'; // Perhatikan path ../../
+import apiClient from '../../api/axiosConfig'; 
 
-// Helper untuk format
 const formatDate = (dateString) => new Date(dateString).toLocaleString('id-ID', {
   day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
 });
 const formatHarga = (harga) => `Rp ${parseFloat(harga).toLocaleString('id-ID')}`;
 
-// Helper untuk styling status
 const getStatusClass = (status) => {
   switch (status) {
     case 'COMPLETED': return 'bg-green-900 text-green-300';
@@ -27,7 +24,6 @@ function ManageOrdersPage() {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        // Panggil API admin baru yang kita buat
         const res = await apiClient.get('/admin/all-orders/');
         setOrders(res.data);
       } catch (err) {
@@ -38,7 +34,7 @@ function ManageOrdersPage() {
       }
     };
     fetchOrders();
-  }, []); // [] berarti hanya dijalankan sekali saat komponen dimuat
+  }, []); 
 
   if (loading) return <div className="p-8 text-gray-400">Memuat semua pesanan...</div>;
   if (error) return <div className="p-8 text-red-400">{error}</div>;
@@ -46,11 +42,8 @@ function ManageOrdersPage() {
   return (
     <div className="p-8 text-white">
       <h1 className="text-3xl font-bold mb-6">Kelola Semua Pesanan</h1>
-      
-      {/* Container Tabel */}
       <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
-          {/* Header Tabel */}
           <thead className="bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Tipe</th>
@@ -62,7 +55,6 @@ function ManageOrdersPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Aksi</th>
             </tr>
           </thead>
-          {/* Body Tabel */}
           <tbody className="divide-y divide-gray-700">
             {orders.map(order => (
               <tr key={order.kode_transaksi} className="hover:bg-gray-800">
@@ -77,7 +69,6 @@ function ManageOrdersPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  {/* Kita bisa tambahkan link detail nanti */}
                   <button className="text-purple-400 hover:text-purple-300">Detail</button>
                 </td>
               </tr>

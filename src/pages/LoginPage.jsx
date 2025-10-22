@@ -1,23 +1,22 @@
 import React, { useState, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Import useNavigate
-import { toast } from 'react-hot-toast'; // 2. Import toast
+import { Link, useNavigate } from 'react-router-dom'; 
+import { toast } from 'react-hot-toast'; 
 
 function LoginPage() {
   const { loginUser } = useContext(AuthContext);
-  const navigate = useNavigate(); // 3. Inisialisasi navigate
+  const navigate = useNavigate(); 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // 4. Tambah state loading
+  const [loading, setLoading] = useState(false); 
 
-  // 5. Ubah handleSubmit menjadi async dan tambahkan error handling
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       await loginUser(username, password);
       toast.success('Login berhasil!');
-      navigate('/'); // Arahkan ke home setelah sukses
+      navigate('/');
     } catch (error) {
       console.error("Login error:", error);
       toast.error('Login Gagal: Username atau password salah.');
@@ -55,14 +54,13 @@ function LoginPage() {
           </div>
           <button 
             type="submit" 
-            disabled={loading} // 6. Tambah disabled state
+            disabled={loading} 
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-md disabled:opacity-50"
           >
             {loading ? 'Loading...' : 'Login'}
           </button>
         </form>
 
-        {/* 7. TAMBAHKAN LINK LUPA PASSWORD */}
         <div className="text-sm text-center mt-4">
           <Link to="/lupa-password" className="text-purple-400 hover:text-purple-300">
             Lupa password?

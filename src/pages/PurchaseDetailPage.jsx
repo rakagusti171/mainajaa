@@ -14,7 +14,6 @@ function PurchaseDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     
-    // State untuk Form Ulasan
     const [rating, setRating] = useState(0);
     const [ulasanText, setUlasanText] = useState('');
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
@@ -26,11 +25,9 @@ function PurchaseDetailPage() {
             try {
                 setLoading(true);
                 setError('');
-                // Panggil API yang sudah kita buat
                 const res = await apiClient.get(`/pembelian/detail/${kodeTransaksi}/`);
                 setPesanan(res.data);
                 
-                // Set state ulasan jika sudah ada
                 if (res.data.tipe === 'Akun' && res.data.rating) {
                     setRating(res.data.rating);
                     setUlasanText(res.data.ulasan || '');
@@ -45,9 +42,8 @@ function PurchaseDetailPage() {
             }
         };
         fetchPesanan();
-    }, [kodeTransaksi, user]); // Jalankan ulang jika kodeTransaksi berubah
+    }, [kodeTransaksi, user]); 
 
-    // Fungsi untuk Submit Ulasan
     const handleSubmitReview = async (e) => {
         e.preventDefault();
         if (rating === 0) {
@@ -57,14 +53,12 @@ function PurchaseDetailPage() {
         
         setIsSubmittingReview(true);
         try {
-            // Panggil API ulasan yang sudah kita buat
             const res = await apiClient.post(`/pembelian/review/${pesanan.id}/`, {
                 rating: rating,
                 ulasan: ulasanText
             });
             toast.success('Ulasan berhasil dikirim!');
             
-            // Update state pesanan secara lokal dengan data dari respons
             setPesanan(prev => ({ 
                 ...prev, 
                 rating: res.data.rating, 
@@ -79,18 +73,15 @@ function PurchaseDetailPage() {
         }
     };
 
-    // Helper
     const formatHarga = (harga) => `Rp ${parseFloat(harga).toLocaleString('id-ID')}`;
     const formatTanggal = (tanggal) => new Date(tanggal).toLocaleString('id-ID', {
         day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
     
-    // Tampilan Loading / Error
     if (loading) return <div className="text-center p-20 text-gray-400">Memuat detail pesanan...</div>;
     if (error) return <div className="text-center p-20 text-red-400">{error}</div>;
     if (!pesanan) return <div className="text-center p-20 text-gray-400">Pesanan tidak ditemukan.</div>;
 
-    // Tampilan Data
     return (
         <div className="container mx-auto px-6 py-8 max-w-2xl">
             <div className="mb-4 text-sm text-gray-400">
@@ -122,7 +113,6 @@ function PurchaseDetailPage() {
                         <span className="text-gray-400">Total Bayar:</span>
                         <span className="font-semibold text-white">{formatHarga(pesanan.total)}</span>
                     </div>
-                    {/* Detail spesifik TopUp */}
                     {pesanan.tipe === 'TopUp' && (
                          <div className="flex justify-between">
                             <span className="text-gray-400">Game ID:</span>
@@ -133,7 +123,6 @@ function PurchaseDetailPage() {
                     )}
                 </div>
 
-                {/* Tampilkan Data Akun jika Tipe Akun & Lunas */}
                 {pesanan.tipe === 'Akun' && pesanan.status === 'COMPLETED' && (
                     <div className="mt-6 pt-6 border-t border-gray-700">
                         <h2 className="text-xl font-semibold text-white mb-4">Data Akun</h2>
@@ -151,13 +140,11 @@ function PurchaseDetailPage() {
                     </div>
                 )}
                 
-                {/* Form Ulasan (Hanya untuk Tipe Akun & Lunas) */}
                 {pesanan.tipe === 'Akun' && pesanan.status === 'COMPLETED' && (
                      <div className="mt-6 pt-6 border-t border-gray-700">
                          <h2 className="text-xl font-semibold text-white mb-4">
                             {pesanan.rating ? 'Ulasan Anda' : 'Beri Ulasan'}
                          </h2>
-                         {/* Tampilkan ulasan jika sudah ada */}
                          {pesanan.rating ? (
                             <div>
                                 <div className="flex items-center space-x-1 text-yellow-400 mb-2">
@@ -168,7 +155,6 @@ function PurchaseDetailPage() {
                                 <p className="text-gray-300 italic">"{pesanan.ulasan || 'Tidak ada komentar.'}"</p>
                             </div>
                          ) : (
-                            /* Tampilkan form jika belum ada ulasan */
                             <form onSubmit={handleSubmitReview} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-2">Rating Anda</label>

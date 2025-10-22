@@ -1,11 +1,10 @@
-// frontend/src/pages/admin/ProductEditTopUpPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import apiClient from '../../api/axiosConfig';
 import { toast } from 'react-hot-toast';
 
 function ProductEditTopUpPage() {
-  const { id: topupId } = useParams(); // Ambil ID dari URL
+  const { id: topupId } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -14,11 +13,10 @@ function ProductEditTopUpPage() {
     harga: '',
   });
 
-  const [currentImage, setCurrentImage] = useState(null); // Gambar saat ini
-  const [gambarBaru, setGambarBaru] = useState(null);    // File gambar baru
+  const [currentImage, setCurrentImage] = useState(null); 
+  const [gambarBaru, setGambarBaru] = useState(null);   
   const [loading, setLoading] = useState(true);
 
-  // 1. Ambil data produk yang ada
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -31,11 +29,11 @@ function ProductEditTopUpPage() {
           nama_paket: data.nama_paket,
           harga: data.harga,
         });
-        setCurrentImage(data.gambar); // Simpan URL gambar saat ini
+        setCurrentImage(data.gambar); 
 
       } catch (err) {
         toast.error('Gagal memuat data produk.');
-        navigate('/dashboard/produk'); // Kembali jika gagal load
+        navigate('/dashboard/produk');
       } finally {
         setLoading(false);
       }
@@ -51,7 +49,6 @@ function ProductEditTopUpPage() {
     setGambarBaru(e.target.files[0]);
   };
 
-  // 2. Fungsi submit update
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -61,7 +58,6 @@ function ProductEditTopUpPage() {
     dataToSubmit.append('nama_paket', formData.nama_paket);
     dataToSubmit.append('harga', formData.harga);
 
-    // Tambahkan gambar baru HANYA jika ada
     if (gambarBaru) {
       dataToSubmit.append('gambar', gambarBaru);
     }

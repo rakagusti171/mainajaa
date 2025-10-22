@@ -13,7 +13,8 @@ function AkunDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isFavorited, setIsFavorited] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null); 
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -27,8 +28,7 @@ function AkunDetailPage() {
 
         if (accountRes.data.gambar) {
             setSelectedImage(accountRes.data.gambar);
-        } 
-        else if (accountRes.data.images && accountRes.data.images.length > 0) {
+        } else if (accountRes.data.images && accountRes.data.images.length > 0) {
             setSelectedImage(accountRes.data.images[0].gambar);
         }
 
@@ -69,6 +69,16 @@ function AkunDetailPage() {
 
   const formatHarga = (harga) => `Rp ${parseFloat(harga).toLocaleString('id-ID')}`;
 
+  const openModal = () => {
+    if (selectedImage) {
+        setIsModalOpen(true);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   if (loading) return <div className="text-center p-20 text-gray-400">Memuat akun...</div>;
   if (!account) return <div className="text-center p-20 text-gray-400">Akun tidak ditemukan.</div>;
 
@@ -93,7 +103,8 @@ function AkunDetailPage() {
             <img 
               src={selectedImage}
               alt={account.nama_akun} 
-              className="w-full h-auto max-h-[500px] object-cover rounded-lg mb-4 border border-gray-700"
+              className="w-full h-auto max-h-[500px] object-cover rounded-lg mb-4 border border-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={openModal} 
             />
             {allImages.length > 1 && (
               <div className="flex space-x-2 overflow-x-auto p-2">
@@ -123,12 +134,10 @@ function AkunDetailPage() {
         </div>
 
         <div className="md:col-span-1">
-          {/* PERBAIKAN: Hapus z-10, navbar dropdown akan tetap di atas */}
           <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 sticky top-8">
             <h1 className="text-3xl font-bold text-white">{account.nama_akun}</h1>
             <p className="text-gray-400 mt-1">{account.game} • Level {account.level}</p>
             <p className="text-4xl font-bold text-purple-400 my-6">{formatHarga(account.harga)}</p>
-            
             <button 
               onClick={handleBeliSekarang}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-md text-lg"
@@ -139,11 +148,7 @@ function AkunDetailPage() {
               onClick={handleToggleFavorite}
               className="w-full mt-3 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md flex items-center justify-center"
             >
-              {isFavorited ? (
-                <HeartIconSolid className="w-5 h-5 mr-2 text-red-500" />
-              ) : (
-                <HeartIconOutline className="w-5 h-5 mr-2" />
-              )}
+              {isFavorited ? <HeartIconSolid className="w-5 h-5 mr-2 text-red-500" /> : <HeartIconOutline className="w-5 h-5 mr-2" />}
               {isFavorited ? 'Hapus dari Favorit' : 'Tambah ke Favorit'}
             </button>
             <div className="mt-6">
@@ -182,20 +187,12 @@ function AkunDetailPage() {
           {similarAccounts.length > 0 ? (
             similarAccounts.map(acc => (
               <Link key={acc.id} to={`/akun/${acc.id}`} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-purple-500 transition-all duration-300 flex flex-col">
-                <img 
-                  className="h-40 w-full object-cover" 
-                  src={acc.gambar}
-                  alt={acc.nama_akun} 
-                />
+                <img className="h-40 w-full object-cover" src={acc.gambar} alt={acc.nama_akun} />
                 <div className="p-4 flex flex-col flex-grow">
                   <h3 className="text-md font-semibold text-white">{acc.nama_akun}</h3>
                   <p className="text-sm text-gray-400">{acc.game}</p>
-                  <p className="mt-3 text-lg font-bold text-purple-400 flex-grow">
-                    {formatHarga(acc.harga)}
-                  </p>
-                  <span className="mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-md text-sm">
-                    Lihat Detail
-                  </span>
+                  <p className="mt-3 text-lg font-bold text-purple-400 flex-grow">{formatHarga(acc.harga)}</p>
+                  <span className="mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-md text-sm">Lihat Detail</span>
                 </div>
               </Link>
             ))
@@ -204,6 +201,33 @@ function AkunDetailPage() {
           )}
         </div>
       </div>
+      
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4"
+          onClick={closeModal}
+        >
+          <div 
+            className="relative" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={selectedImage} 
+              alt="Tampilan penuh" 
+              className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            />
+            <button 
+              onClick={closeModal}
+              className="absolute -top-4 -right-4 text-white bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition-colors"
+              aria-label="Tutup"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

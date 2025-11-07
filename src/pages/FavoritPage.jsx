@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 import AuthContext from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid"; 
 import { toast } from 'react-hot-toast';
 import LazyImage from '../components/LazyImage';
@@ -14,6 +15,7 @@ function FavoritPage() {
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const fetchFavorites = async () => {
     if (!user) {
@@ -26,8 +28,8 @@ function FavoritPage() {
       const res = await apiClient.get('/accounts/favorit/');
       setFavoriteAccounts(res.data);
     } catch (err) {
-      setError('Gagal memuat akun favorit.');
-      toast.error('Gagal memuat favorit.');
+      setError(t('failedToLoadFavorites'));
+      toast.error(t('failedToLoadFavorites'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -46,11 +48,11 @@ function FavoritPage() {
       );
 
       await apiClient.post(`/accounts/${accountId}/toggle-favorite/`);
-      toast.success('Dihapus dari favorit.');
+      toast.success(t('removedFromFavorites'));
 
     } catch (error) {
       console.error('Gagal menghapus favorit:', error);
-      toast.error('Gagal menghapus favorit.');
+      toast.error(t('failedToRemoveFavorite'));
     }
   };
 
@@ -60,7 +62,7 @@ function FavoritPage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">Akun Favorit Saya</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">{t('myFavoriteAccounts')}</h1>
 
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
@@ -90,12 +92,12 @@ function FavoritPage() {
                 />
                 <div className="p-2 sm:p-4 flex flex-col flex-grow">
                   <h3 className="text-xs sm:text-md font-semibold text-white line-clamp-2">{akun.nama_akun}</h3>
-                  <p className="text-xs sm:text-sm text-gray-400 mt-1">{akun.game} - Level {akun.level}</p>
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">{akun.game} - {t('level')} {akun.level}</p>
                   <p className="mt-2 sm:mt-3 text-sm sm:text-lg font-bold text-purple-400 flex-grow">
                     {formatHarga(akun.harga)}
                   </p>
                   <span className="mt-2 sm:mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 sm:py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm">
-                    Lihat Detail
+                    {t('viewDetails')}
                   </span>
                 </div>
               </Link>
@@ -104,12 +106,12 @@ function FavoritPage() {
         </div>
       ) : (
         <div className="text-center p-12 sm:p-20 bg-gray-800/50 border border-gray-700 rounded-lg">
-          <p className="text-gray-400 text-base sm:text-lg mb-4">Anda belum memiliki akun favorit.</p>
+          <p className="text-gray-400 text-base sm:text-lg mb-4">{t('noFavorites')}</p>
           <Link
             to="/semua-akun"
             className="text-purple-400 hover:text-purple-300 font-semibold text-sm sm:text-base"
           >
-            Jelajahi semua akun &rarr;
+            {t('exploreAllAccounts')} &rarr;
           </Link>
         </div>
       )}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
+import { useLanguage } from '../context/LanguageContext';
 import LazyImage from '../components/LazyImage';
 import { ProductCardSkeleton } from '../components/LoadingSkeleton';
 
@@ -11,6 +12,7 @@ function SearchPage() {
   const [topupProducts, setTopupProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'accounts', 'topup'
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!query.trim()) {
@@ -61,12 +63,12 @@ function SearchPage() {
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">
-        Hasil Pencarian: <span className="text-purple-400">"{query}"</span>
+        {t('searchResultsFor')} <span className="text-purple-400">"{query}"</span>
       </h1>
 
       {!query.trim() ? (
         <div className="text-center py-12 text-gray-400">
-          <p className="text-lg mb-4">Masukkan kata kunci untuk mencari produk</p>
+          <p className="text-lg mb-4">{t('enterKeyword')}</p>
         </div>
       ) : (
         <>
@@ -80,7 +82,7 @@ function SearchPage() {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Semua ({accounts.length + topupProducts.length})
+              {t('all')} ({accounts.length + topupProducts.length})
             </button>
             <button
               onClick={() => setActiveTab('accounts')}
@@ -90,7 +92,7 @@ function SearchPage() {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Akun ({accounts.length})
+              {t('account')} ({accounts.length})
             </button>
             <button
               onClick={() => setActiveTab('topup')}
@@ -100,7 +102,7 @@ function SearchPage() {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Top Up ({topupProducts.length})
+              {t('topUp')} ({topupProducts.length})
             </button>
           </div>
 
@@ -113,7 +115,7 @@ function SearchPage() {
               {/* Accounts Results */}
               {(activeTab === 'all' || activeTab === 'accounts') && filteredAccounts.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Akun Gaming</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">{t('gamingAccounts')}</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
                     {filteredAccounts.map(akun => (
                       <Link
@@ -133,7 +135,7 @@ function SearchPage() {
                             {formatHarga(akun.harga)}
                           </p>
                           <span className="mt-2 sm:mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 sm:py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm">
-                            Lihat Detail
+                            {t('viewDetails')}
                           </span>
                         </div>
                       </Link>
@@ -145,7 +147,7 @@ function SearchPage() {
               {/* TopUp Results */}
               {(activeTab === 'all' || activeTab === 'topup') && filteredTopup.length > 0 && (
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Produk Top Up</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">{t('topUpProducts')}</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
                     {filteredTopup.map(product => (
                       <Link
@@ -165,7 +167,7 @@ function SearchPage() {
                             {formatHarga(product.harga)}
                           </p>
                           <span className="mt-2 sm:mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 sm:py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm">
-                            Top Up
+                            {t('topUp')}
                           </span>
                         </div>
                       </Link>
@@ -177,13 +179,13 @@ function SearchPage() {
               {/* No Results */}
               {!loading && filteredAccounts.length === 0 && filteredTopup.length === 0 && (
                 <div className="text-center py-12 text-gray-400">
-                  <p className="text-lg mb-4">Tidak ada hasil untuk "{query}"</p>
-                  <p className="text-sm mb-6">Coba gunakan kata kunci lain</p>
+                  <p className="text-lg mb-4">{t('noResultsFor')} "{query}"</p>
+                  <p className="text-sm mb-6">{t('tryOtherKeyword')}</p>
                   <Link
                     to="/semua-akun"
                     className="text-purple-400 hover:text-purple-300 font-semibold"
                   >
-                    Lihat Semua Akun →
+                    {t('viewAllAccounts')} →
                   </Link>
                 </div>
               )}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
+import { useLanguage } from '../context/LanguageContext';
 import LazyImage from '../components/LazyImage';
 import { ProductCardSkeleton } from '../components/LoadingSkeleton';
 
@@ -8,6 +9,7 @@ function TopUpPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useLanguage();
 
   const [filterGame, setFilterGame] = useState('semua');
   
@@ -24,7 +26,7 @@ function TopUpPage() {
         });
         setProducts(res.data);
       } catch (err) {
-        setError('Gagal memuat produk. Coba lagi nanti.');
+        setError(t('failedToLoad'));
         console.error(err);
       } finally {
         setLoading(false);
@@ -39,7 +41,7 @@ function TopUpPage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">Top Up Game</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">{t('topUpGame')}</h1>
 
       <div className="mb-6">
         <select 
@@ -49,7 +51,7 @@ function TopUpPage() {
           aria-label="Filter by game"
         >
           {games.map(game => (
-            <option key={game} value={game}>{game === 'semua' ? 'Semua Game' : game}</option>
+            <option key={game} value={game}>{game === 'semua' ? t('allGames') : game}</option>
           ))}
         </select>
       </div>
@@ -80,14 +82,14 @@ function TopUpPage() {
                     {formatHarga(product.harga)}
                   </p>
                   <span className="mt-2 sm:mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 sm:py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm">
-                    Top Up
+                    {t('topUp')}
                   </span>
                 </div>
               </Link>
             ))
           ) : (
             <p className="text-gray-500 col-span-full text-center text-sm sm:text-base">
-              Tidak ada produk top up yang ditemukan untuk game ini.
+              {t('noTopUpProducts')}
             </p>
           )}
         </div>

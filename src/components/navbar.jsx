@@ -57,7 +57,7 @@ function Navbar() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari akun atau top up..."
+                placeholder={t('searchPlaceholder')}
                 className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 pl-10 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
                 aria-label="Search products"
               />
@@ -89,14 +89,14 @@ function Navbar() {
                 aria-label="User menu"
                 aria-expanded={isDropdownOpen}
               >
-                Hi, {user.username}
+                {t('hi')}, {user.username}
                 <ChevronDownIcon />
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg py-1 z-50">
                   <Link to="/profil" onClick={() => setIsDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white" aria-label={t('profile')}>{t('profile')}</Link>
                   {user && user.is_staff && (
-                    <Link to="/dashboard" onClick={() => setIsDropdownOpen(false)} className="block px-4 py-2 text-sm text-yellow-300 font-bold hover:text-yellow-300">Dashboard Admin</Link>
+                    <Link to="/dashboard" onClick={() => setIsDropdownOpen(false)} className="block px-4 py-2 text-sm text-yellow-300 font-bold hover:text-yellow-300">{t('adminDashboard')}</Link>
                   )}
                   <div className="border-t border-gray-700 my-1"></div>
                   <button onClick={() => { logoutUser(); setIsDropdownOpen(false); }} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300" aria-label={t('logout')}>
@@ -147,7 +147,7 @@ function Navbar() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari akun atau top up..."
+                placeholder={t('searchPlaceholder')}
                 className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 pl-10 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
                 aria-label="Search products"
                 autoFocus
@@ -177,9 +177,9 @@ function Navbar() {
               {/* Tombol Login/User HP */}
               {user ? (
                 <>
-                  <Link to="/profil" onClick={closeAllMenus} className="block text-white font-semibold">{t('profile')} (Hi, {user.username})</Link>
+                  <Link to="/profil" onClick={closeAllMenus} className="block text-white font-semibold">{t('profile')} ({t('hi')}, {user.username})</Link>
                   {user.is_staff && (
-                    <Link to="/dashboard" onClick={closeAllMenus} className="block text-yellow-300 font-bold">Dashboard Admin</Link>
+                    <Link to="/dashboard" onClick={closeAllMenus} className="block text-yellow-300 font-bold">{t('adminDashboard')}</Link>
                   )}
                   <button onClick={() => { logoutUser(); closeAllMenus(); }} className="block w-full text-left text-red-400" aria-label={t('logout')}>
                     {t('logout')}

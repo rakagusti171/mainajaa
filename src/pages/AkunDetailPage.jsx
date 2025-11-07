@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 import AuthContext from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { HeartIcon as HeartIconOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import LazyImage from '../components/LazyImage';
@@ -19,6 +20,7 @@ function AkunDetailPage() {
 
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchAccountDetails = async () => {
@@ -81,8 +83,8 @@ function AkunDetailPage() {
     setIsModalOpen(false);
   };
 
-  if (loading) return <div className="text-center p-20 text-gray-400">Memuat akun...</div>;
-  if (!account) return <div className="text-center p-20 text-gray-400">Akun tidak ditemukan.</div>;
+  if (loading) return <div className="text-center p-20 text-gray-400">{t('loadingAccount')}</div>;
+  if (!account) return <div className="text-center p-20 text-gray-400">{t('accountNotFound')}</div>;
 
   const allImages = [];
   if (account.gambar) {
@@ -95,7 +97,7 @@ function AkunDetailPage() {
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="text-sm text-gray-400 mb-6">
-        <Link to="/semua-akun" className="hover:text-white">Semua Akun</Link>
+        <Link to="/semua-akun" className="hover:text-white">{t('allAccounts')}</Link>
         <span className="mx-2">&gt;</span><span className="text-white">{account.nama_akun}</span>
       </div>
 
@@ -131,34 +133,34 @@ function AkunDetailPage() {
           </div>
           
           <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Deskripsi Akun</h2>
-            <p className="text-gray-300 whitespace-pre-line">{account.deskripsi || 'Tidak ada deskripsi.'}</p>
+            <h2 className="text-2xl font-bold text-white mb-4">{t('accountDescription')}</h2>
+            <p className="text-gray-300 whitespace-pre-line">{account.deskripsi || t('noDescription')}</p>
           </div>
         </div>
 
         <div className="md:col-span-1">
           <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 sticky top-8">
             <h1 className="text-3xl font-bold text-white">{account.nama_akun}</h1>
-            <p className="text-gray-400 mt-1">{account.game} • Level {account.level}</p>
+            <p className="text-gray-400 mt-1">{account.game} • {t('level')} {account.level}</p>
             <p className="text-4xl font-bold text-purple-400 my-6">{formatHarga(account.harga)}</p>
             <button 
               onClick={handleBeliSekarang}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-md text-lg"
             >
-              Beli Sekarang
+              {t('buyNow')}
             </button>
             <button 
               onClick={handleToggleFavorite}
               className="w-full mt-3 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md flex items-center justify-center"
             >
               {isFavorited ? <HeartIconSolid className="w-5 h-5 mr-2 text-red-500" /> : <HeartIconOutline className="w-5 h-5 mr-2" />}
-              {isFavorited ? 'Hapus dari Favorit' : 'Tambah ke Favorit'}
+              {isFavorited ? t('removeFromFavorites') : t('addToFavorites')}
             </button>
             <div className="mt-6">
-              <h3 className="text-lg font-semibold text-white mb-2">Perlindungan Pembeli</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">{t('buyerProtection')}</h3>
               <ul className="text-gray-400 space-y-1 text-sm">
-                <li><span className="text-green-500 mr-2">✓</span> Garansi 100% Uang Kembali</li>
-                <li><span className="text-green-500 mr-2">✓</span> Transaksi Aman</li>
+                <li><span className="text-green-500 mr-2">✓</span> {t('moneyBackGuarantee')}</li>
+                <li><span className="text-green-500 mr-2">✓</span> {t('secureTransaction')}</li>
               </ul>
             </div>
           </div>
@@ -166,7 +168,7 @@ function AkunDetailPage() {
       </div>
 
       <div className="mt-16 bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">Ulasan Pelanggan untuk {account.game}</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">{t('customerReviews')} {account.game}</h2>
         {reviews.length > 0 ? (
           <div className="space-y-6">
             {reviews.map((review, index) => (
@@ -180,12 +182,12 @@ function AkunDetailPage() {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">Belum ada ulasan untuk game ini.</p>
+          <p className="text-gray-500">{t('noReviews')}</p>
         )}
       </div>
 
       <div className="mt-16">
-        <h2 className="text-2xl font-bold text-white mb-6">Akun Serupa</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">{t('similarAccounts')}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {similarAccounts.length > 0 ? (
             similarAccounts.map(acc => (
@@ -195,12 +197,12 @@ function AkunDetailPage() {
                   <h3 className="text-md font-semibold text-white">{acc.nama_akun}</h3>
                   <p className="text-sm text-gray-400">{acc.game}</p>
                   <p className="mt-3 text-lg font-bold text-purple-400 flex-grow">{formatHarga(acc.harga)}</p>
-                  <span className="mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-md text-sm">Lihat Detail</span>
+                  <span className="mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-md text-sm">{t('viewDetails')}</span>
                 </div>
               </Link>
             ))
           ) : (
-            <p className="text-gray-500 col-span-full">Tidak ada akun serupa.</p>
+            <p className="text-gray-500 col-span-full">{t('noSimilarAccounts')}</p>
           )}
         </div>
       </div>
@@ -222,7 +224,7 @@ function AkunDetailPage() {
             <button 
               onClick={closeModal}
               className="absolute -top-4 -right-4 text-white bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition-colors"
-              aria-label="Tutup"
+              aria-label={t('close')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

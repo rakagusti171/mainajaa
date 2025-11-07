@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 import AuthContext from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'react-hot-toast';
 
 const settings = {
@@ -13,6 +14,7 @@ function PaymentPage() {
   const { accountId } = useParams();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,13 +39,13 @@ function PaymentPage() {
     };
     script.onerror = () => {
         console.error("Failed to load Midtrans Snap script.");
-        toast.error("Gagal memuat script pembayaran. Coba refresh halaman.");
+        toast.error(t('paymentFailed'));
     };
     document.body.appendChild(script);
 
     const fetchAccount = async () => {
       if (!user) {
-        toast.error("Anda harus login untuk melanjutkan.");
+        toast.error(t('mustLogin'));
         navigate('/login');
         return;
       }
@@ -59,7 +61,7 @@ function PaymentPage() {
         setHargaFinal(originalPrice);
       } catch (err) {
         console.error("Fetch account error:", err);
-        toast.error('Gagal memuat detail akun. Mungkin akun sudah terjual.');
+        toast.error(t('accountSold'));
         navigate('/semua-akun');
       } finally {
          setLoading(false);
@@ -94,7 +96,7 @@ function PaymentPage() {
         setDiskonAmount(0);
         setHargaFinal(originalPrice);
      } else {
-        toast.error("Data akun belum termuat.");
+        toast.error(t('accountDataNotLoaded'));
         setIsValidating(false);
         return;
      }
@@ -110,13 +112,13 @@ function PaymentPage() {
         setHargaAsli(parseFloat(response.data.harga_asli));
         setDiskonAmount(parseFloat(response.data.diskon_amount));
         setHargaFinal(parseFloat(response.data.harga_final));
-        toast.success(`Kupon '${response.data.kode_kupon}' berhasil diterapkan!`);
+        toast.success(t('couponApplied'));
       } else {
-        setCouponError(response.data.error || 'Kupon tidak valid.');
-        toast.error(response.data.error || 'Kupon tidak valid.');
+        setCouponError(response.data.error || t('couponInvalid'));
+        toast.error(response.data.error || t('couponInvalid'));
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.error || 'Kupon tidak valid.';
+      const errorMsg = err.response?.data?.error || t('couponInvalid');
       setCouponError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -126,11 +128,11 @@ function PaymentPage() {
 
   const handlePayment = async () => {
      if (!account) {
-        toast.error("Data akun belum termuat.");
+        toast.error(t('accountDataNotLoaded'));
         return;
      }
      if (!window.snap) {
-        toast.error("Layanan pembayaran belum siap. Coba refresh halaman.");
+        toast.error(t('paymentNotReady'));
         return;
      }
 
@@ -146,38 +148,38 @@ function PaymentPage() {
       if (midtransToken) {
         window.snap.pay(midtransToken, {
           onSuccess: function(result){
-            toast.success("Pembayaran berhasil!");
+            toast.success(t('paymentSuccess'));
             navigate('/profil');
           },
           onPending: function(result){
-            toast("Menunggu pembayaran Anda!", { icon: '⏳' });
+            toast(t('waitingPayment'), { icon: '⏳' });
             navigate('/profil');
           },
           onError: function(result){
-            toast.error("Pembayaran gagal!");
+            toast.error(t('paymentFailedMsg'));
             setIsProcessing(false);
           },
           onClose: function(){
-            toast.info('Anda menutup popup pembayaran.');
+            toast.info(t('paymentClosed'));
             setIsProcessing(false);
           }
         });
       } else {
-         throw new Error("Token Midtrans tidak diterima.");
+         throw new Error(t('invalidToken'));
       }
     } catch (err) {
       console.error("Payment error:", err);
-      toast.error('Gagal membuat transaksi: ' + (err.response?.data?.error || 'Terjadi kesalahan server.'));
+      toast.error(t('transactionFailed') + ' ' + (err.response?.data?.error || t('serverError')));
       setIsProcessing(false);
     }
   };
 
   if (loading) {
-    return <div className="text-center p-20 text-gray-400">Memuat checkout...</div>;
+    return <div className="text-center p-20 text-gray-400">{t('loadingCheckout')}</div>;
   }
 
   if (!account) {
-     return <div className="text-center p-20 text-red-400">Gagal memuat detail akun. Silakan coba lagi.</div>;
+     return <div className="text-center p-20 text-red-400">{t('failedToLoadAccount')}</div>;
   }
 
   const formatHarga = (harga) => {
@@ -187,11 +189,11 @@ function PaymentPage() {
 
   return (
     <div className="container mx-auto px-6 py-12 max-w-4xl">
-      <h1 className="text-3xl font-bold text-white mb-8">Checkout Pembayaran</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">{t('checkout')}</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
         <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-white mb-4">Ringkasan Pesanan</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">{t('orderSummary')}</h2>
           <div className="flex space-x-4">
             <img
               src={account.gambar}
@@ -209,15 +211,15 @@ function PaymentPage() {
         </div>
 
         <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-          <h2 className="text-2xl font-semibold text-white mb-4">Metode Pembayaran</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">{t('paymentMethod')}</h2>
           <div>
-            <label className="block text-sm font-medium text-gray-300">Kode Kupon (Opsional)</label>
+            <label className="block text-sm font-medium text-gray-300">{t('couponCode')}</label>
             <div className="flex space-x-2 mt-1">
               <input
                 type="text"
                 value={couponCode}
                 onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
-                placeholder="Masukkan kode kupon"
+                placeholder={t('enterCouponCode')}
                 className="flex-grow bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-gray-200 uppercase focus:border-purple-500 focus:ring-purple-500"
                 disabled={isValidating}
               />
@@ -226,7 +228,7 @@ function PaymentPage() {
                 disabled={isValidating || !couponCode}
                 className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md disabled:opacity-50"
               >
-                {isValidating ? '...' : 'Terapkan'}
+                {isValidating ? '...' : t('apply')}
               </button>
             </div>
             {couponError && <p className="text-red-400 text-sm mt-2">{couponError}</p>}
@@ -235,18 +237,18 @@ function PaymentPage() {
           <div className="space-y-2 border-t border-gray-700 mt-6 pt-4">
             {diskonAmount > 0 && (
                 <div className="flex justify-between text-gray-300">
-                    <span>Harga Asli:</span>
+                    <span>{t('originalPrice')}</span>
                     <span>Rp {formatHarga(hargaAsli)}</span>
                 </div>
             )}
             {diskonAmount > 0 && (
               <div className="flex justify-between text-gray-300">
-                <span>Diskon ({appliedCoupon}):</span>
+                <span>{t('discount')} ({appliedCoupon}):</span>
                 <span className="text-red-400">- Rp {formatHarga(diskonAmount)}</span>
               </div>
             )}
             <div className="flex justify-between text-white text-2xl font-bold pt-2">
-              <span>Total Bayar:</span>
+              <span>{t('totalPay')}</span>
               <span className="text-purple-400">Rp {formatHarga(hargaFinal)}</span>
             </div>
           </div>
@@ -256,7 +258,7 @@ function PaymentPage() {
             disabled={isProcessing || loading}
             className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md text-lg disabled:opacity-50"
           >
-            {isProcessing ? 'Memproses...' : 'Bayar Sekarang'}
+            {isProcessing ? t('processing') : t('payNow')}
           </button>
         </div>
       </div>

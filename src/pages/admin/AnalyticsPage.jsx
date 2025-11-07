@@ -8,7 +8,14 @@ import {
   UserGroupIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
+import RevenueChart from '../../components/analytics/RevenueChart';
+import SalesByGameChart from '../../components/analytics/SalesByGameChart';
+import OrderStatusChart from '../../components/analytics/OrderStatusChart';
+import ConversionFunnel from '../../components/analytics/ConversionFunnel';
+import RevenueByTypeChart from '../../components/analytics/RevenueByTypeChart';
+import UserBehaviorChart from '../../components/analytics/UserBehaviorChart';
 
 const formatRupiah = (angka) => {
   return new Intl.NumberFormat('id-ID', {
@@ -27,7 +34,8 @@ function AnalyticsPage() {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [timeRange, setTimeRange] = useState('7d'); // 7d, 30d, month
+  const [timeRange, setTimeRange] = useState('daily'); // daily, weekly, monthly
+  const [chartType, setChartType] = useState('bar'); // bar, pie for sales by game
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -45,6 +53,53 @@ function AnalyticsPage() {
     fetchAnalytics();
   }, []);
 
+  const exportToCSV = () => {
+    if (!analytics) return;
+    
+    // Prepare CSV data
+    let csvContent = 'Analytics Data Export\n\n';
+    
+    // Summary
+    csvContent += 'SUMMARY\n';
+    csvContent += `Total Users,${analytics.summary.total_users}\n`;
+    csvContent += `Total Products,${analytics.summary.total_products}\n`;
+    csvContent += `Total Orders,${analytics.summary.total_orders}\n`;
+    csvContent += `Conversion Rate,${analytics.summary.conversion_rate}%\n`;
+    csvContent += `Avg Order Value,${analytics.summary.avg_order_value}\n\n`;
+    
+    // Revenue
+    csvContent += 'REVENUE\n';
+    csvContent += `Today,${analytics.revenue.today}\n`;
+    csvContent += `Last 7 Days,${analytics.revenue.last_7_days}\n`;
+    csvContent += `Last 30 Days,${analytics.revenue.last_30_days}\n\n`;
+    
+    // Daily Revenue
+    csvContent += 'DAILY REVENUE\n';
+    csvContent += 'Date,Revenue\n';
+    analytics.revenue.daily.forEach(day => {
+      csvContent += `${day.date},${day.revenue}\n`;
+    });
+    csvContent += '\n';
+    
+    // Sales by Game
+    csvContent += 'SALES BY GAME\n';
+    csvContent += 'Game,Count,Revenue\n';
+    analytics.sales_by_game.forEach(item => {
+      csvContent += `${item.game},${item.count},${item.revenue}\n`;
+    });
+    
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `analytics_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (error) return <div className="p-4 sm:p-6 lg:p-8 text-red-400 text-sm sm:text-base">{error}</div>;
 
   const revenueChange = analytics
@@ -55,40 +110,62 @@ function AnalyticsPage() {
     ? ((analytics.revenue.last_7_days - analytics.revenue.last_month) / (analytics.revenue.last_month || 1)) * 100
     : 0;
 
+  const getRevenueData = () => {
+    if (!analytics) return [];
+    if (timeRange === 'weekly') return analytics.revenue.weekly || [];
+    if (timeRange === 'monthly') return analytics.revenue.monthly || [];
+    return analytics.revenue.daily || [];
+  };
+
+  const getRevenueType = () => {
+    if (timeRange === 'weekly') return 'weekly';
+    if (timeRange === 'monthly') return 'monthly';
+    return 'daily';
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 text-white">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold">Analytics Dashboard</h1>
-        <div className="flex gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Advanced Analytics Dashboard</h1>
+        <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setTimeRange('daily')}
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
+                timeRange === 'daily'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Daily
+            </button>
+            <button
+              onClick={() => setTimeRange('weekly')}
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
+                timeRange === 'weekly'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => setTimeRange('monthly')}
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
+                timeRange === 'monthly'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Monthly
+            </button>
+          </div>
           <button
-            onClick={() => setTimeRange('7d')}
-            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
-              timeRange === '7d'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
+            onClick={exportToCSV}
+            className="px-4 py-2 rounded-md text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition-colors flex items-center gap-2"
           >
-            7 Hari
-          </button>
-          <button
-            onClick={() => setTimeRange('30d')}
-            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
-              timeRange === '30d'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            30 Hari
-          </button>
-          <button
-            onClick={() => setTimeRange('month')}
-            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
-              timeRange === 'month'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            Bulan Ini
+            <ArrowDownTrayIcon className="w-4 h-4" />
+            Export CSV
           </button>
         </div>
       </div>
@@ -204,63 +281,82 @@ function AnalyticsPage() {
             </div>
           </div>
 
+          {/* Revenue Trends Chart */}
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-white">
+                Revenue Trends ({timeRange === 'daily' ? 'Last 7 Days' : timeRange === 'weekly' ? 'Last 4 Weeks' : 'Last 6 Months'})
+              </h2>
+            </div>
+            <RevenueChart data={getRevenueData()} type={getRevenueType()} />
+          </div>
+
+          {/* Charts Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            {/* Daily Revenue Chart */}
+            {/* Sales by Game Chart */}
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Revenue 7 Hari Terakhir</h2>
-              <div className="space-y-3">
-                {analytics.revenue.daily.map((day, index) => {
-                  const maxRevenue = Math.max(...analytics.revenue.daily.map(d => d.revenue));
-                  const percentage = maxRevenue > 0 ? (day.revenue / maxRevenue) * 100 : 0;
-                  return (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="text-xs sm:text-sm text-gray-400 w-16 sm:w-20 flex-shrink-0">
-                        {formatDate(day.date)}
-                      </div>
-                      <div className="flex-1 bg-gray-700 rounded-full h-6 sm:h-8 relative overflow-hidden">
-                        <div
-                          className="bg-gradient-to-r from-purple-600 to-purple-400 h-full rounded-full flex items-center justify-end pr-2 sm:pr-3 transition-all duration-500"
-                          style={{ width: `${percentage}%` }}
-                        >
-                          <span className="text-xs font-semibold text-white">
-                            {formatRupiah(day.revenue)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-white">Sales by Game</h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setChartType('bar')}
+                    className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
+                      chartType === 'bar'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    Bar
+                  </button>
+                  <button
+                    onClick={() => setChartType('pie')}
+                    className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
+                      chartType === 'pie'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    Pie
+                  </button>
+                </div>
               </div>
+              <SalesByGameChart data={analytics.sales_by_game} chartType={chartType} />
             </div>
 
-            {/* Sales by Game */}
+            {/* Order Status Chart */}
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Penjualan per Game</h2>
-              <div className="space-y-3">
-                {analytics.sales_by_game.length > 0 ? (
-                  analytics.sales_by_game.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
-                      <div>
-                        <p className="text-sm sm:text-base font-semibold text-white">{item.game}</p>
-                        <p className="text-xs text-gray-400">{item.count} penjualan</p>
-                      </div>
-                      <p className="text-sm sm:text-base font-bold text-purple-400">
-                        {formatRupiah(item.revenue)}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-400 text-sm">Belum ada data penjualan</p>
-                )}
-              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Order Status Breakdown</h2>
+              <OrderStatusChart data={analytics.orders.status_breakdown} />
             </div>
           </div>
 
+          {/* Second Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            {/* Revenue by Type */}
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Revenue by Product Type</h2>
+              <RevenueByTypeChart data={analytics.revenue_by_type} />
+            </div>
+
+            {/* User Behavior */}
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-4">User Behavior</h2>
+              <UserBehaviorChart data={analytics.user_behavior} />
+            </div>
+          </div>
+
+          {/* Conversion Funnel */}
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Conversion Funnel</h2>
+            <ConversionFunnel data={analytics.conversion_funnel} />
+          </div>
+
+          {/* Top Products & Recent Orders */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Top Products */}
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6">
               <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Produk Terlaris</h2>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-96 overflow-y-auto">
                 {analytics.top_products.accounts && analytics.top_products.accounts.length > 0 ? (
                   analytics.top_products.accounts.map((product, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">

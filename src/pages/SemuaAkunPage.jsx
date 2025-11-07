@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 import AuthContext from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import LazyImage from '../components/LazyImage';
 import { ProductCardSkeleton } from '../components/LoadingSkeleton';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
@@ -18,7 +19,8 @@ function SemuaAkunPage() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
   
-  const { user } = useContext(AuthContext); 
+  const { user } = useContext(AuthContext);
+  const { t } = useLanguage(); 
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -45,7 +47,7 @@ function SemuaAkunPage() {
           setTotalCount(res.data.length);
         }
       } catch (err) {
-        setError('Gagal memuat akun. Pastikan backend berjalan.');
+        setError(t('failedToLoadAccounts'));
         console.error(err);
       } finally {
         setLoading(false);
@@ -67,7 +69,7 @@ function SemuaAkunPage() {
 
   return (
     <div className="container mx-auto px-6 py-8">
-      <h1 className="text-3xl font-bold text-white mb-8">Semua Akun</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">{t('allAccounts')}</h1>
 
       {/* --- Bagian Filter --- */}
       <div className="mb-6 flex flex-wrap gap-4">
@@ -77,7 +79,7 @@ function SemuaAkunPage() {
           className="bg-gray-800 border border-gray-700 text-white rounded-md p-2"
         >
           {games.map(game => (
-            <option key={game} value={game}>{game === 'semua' ? 'Semua Game' : game}</option>
+            <option key={game} value={game}>{game === 'semua' ? t('allGames') : game}</option>
           ))}
         </select>
         
@@ -86,9 +88,9 @@ function SemuaAkunPage() {
           onChange={(e) => setSortBy(e.target.value)}
           className="bg-gray-800 border border-gray-700 text-white rounded-md p-2"
         >
-          <option value="terbaru">Urutkan: Terbaru</option>
-          <option value="termurah">Urutkan: Termurah</option>
-          <option value="termahal">Urutkan: Termahal</option>
+          <option value="terbaru">{t('sortBy')}: {t('newest')}</option>
+          <option value="termurah">{t('sortBy')}: {t('cheapest')}</option>
+          <option value="termahal">{t('sortBy')}: {t('mostExpensive')}</option>
         </select>
       </div>
 
@@ -116,7 +118,7 @@ function SemuaAkunPage() {
                   
                   <div className="p-2 sm:p-4 flex flex-col flex-grow">
                     <h3 className="text-xs sm:text-md font-semibold text-white line-clamp-2">{akun.nama_akun}</h3>
-                    <p className="text-xs sm:text-sm text-gray-400 mt-1">{akun.game} - Level {akun.level}</p>
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">{akun.game} - {t('level')} {akun.level}</p>
                     
                     <div className="flex-grow"></div>
                     
@@ -124,13 +126,13 @@ function SemuaAkunPage() {
                       {formatHarga(akun.harga)}
                     </p>
                     <span className="mt-2 sm:mt-3 block text-center w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 sm:py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm">
-                      Lihat Detail
+                      {t('viewDetails')}
                     </span>
                   </div>
                 </Link>
               ))
             ) : (
-              <p className="text-gray-500 col-span-full text-center text-sm sm:text-base">Tidak ada akun yang ditemukan.</p>
+              <p className="text-gray-500 col-span-full text-center text-sm sm:text-base">{t('noAccountsFound')}</p>
             )}
           </div>
 
@@ -138,7 +140,7 @@ function SemuaAkunPage() {
           {totalPages > 1 && (
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-sm text-gray-400">
-                Menampilkan {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, totalCount)} dari {totalCount} akun
+                {t('showing')} {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, totalCount)} {t('of')} {totalCount} {t('accounts')}
               </p>
               <div className="flex items-center space-x-2">
                 <button

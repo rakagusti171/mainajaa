@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
+import LazyImage from '../components/LazyImage';
+import { ProductCardSkeleton } from '../components/LoadingSkeleton';
 
 function HomePage() {
   const [akunUnggulan, setAkunUnggulan] = useState(null);
@@ -73,12 +75,21 @@ function HomePage() {
 
         <div>
           {loading ? (
-            <div className="text-center p-10">Memuat...</div>
+            <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900/30 border border-gray-700 rounded-2xl p-6 shadow-2xl">
+              <div className="w-full h-64 bg-gray-700 rounded-lg mb-4 animate-pulse"></div>
+              <div className="h-4 bg-gray-700 rounded w-1/3 mb-2 animate-pulse"></div>
+              <div className="h-8 bg-gray-700 rounded w-1/2 mb-4 animate-pulse"></div>
+              <div className="h-10 bg-gray-700 rounded w-full animate-pulse"></div>
+            </div>
           ) : error ? (
-             <div className="text-center p-10 text-red-400">{error}</div>
+             <div className="text-center p-10 text-red-400 text-sm sm:text-base">{error}</div>
           ) : akunUnggulan ? (
             <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900/30 border border-gray-700 rounded-2xl p-6 shadow-2xl">
-              <img src={akunUnggulan.gambar} className="w-full h-64 object-cover rounded-lg mb-4" alt={akunUnggulan.nama_akun} />
+              <LazyImage 
+                src={akunUnggulan.gambar} 
+                alt={akunUnggulan.nama_akun}
+                className="w-full h-64 object-cover rounded-lg mb-4"
+              />
 
               <div className="flex justify-between items-center mb-2">
                 <span className="bg-gray-800 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded">{akunUnggulan.game}</span>

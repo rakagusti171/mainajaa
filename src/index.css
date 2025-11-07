@@ -1,3 +1,134 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Light Mode Styles */
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --border-color: #e5e7eb;
+  --purple-primary: #9333ea;
+  --purple-hover: #7e22ce;
+}
+
+/* Dark Mode Styles (Default) */
+.dark,
+:root {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --border-color: #374151;
+  --purple-primary: #9333ea;
+  --purple-hover: #7e22ce;
+}
+
+/* Base styles */
+body {
+  @apply bg-gray-900 text-white;
+}
+
+.light body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+/* Light mode specific component styles */
+.light .bg-gray-800 {
+  @apply bg-white;
+}
+
+.light .bg-gray-800\/50 {
+  @apply bg-white/90;
+}
+
+.light .bg-gray-900 {
+  @apply bg-gray-50;
+}
+
+.light .text-white {
+  @apply text-gray-900;
+}
+
+.light .text-gray-300 {
+  @apply text-gray-700;
+}
+
+.light .text-gray-400 {
+  @apply text-gray-600;
+}
+
+.light .text-gray-500 {
+  @apply text-gray-500;
+}
+
+.light .border-gray-700 {
+  @apply border-gray-200;
+}
+
+.light .border-gray-600 {
+  @apply border-gray-300;
+}
+
+/* Navbar light mode */
+.light nav {
+  @apply bg-white/90 backdrop-blur-sm border-gray-200;
+}
+
+/* Card light mode */
+.light .bg-gray-800 {
+  @apply bg-white shadow-sm;
+}
+
+.light .bg-gray-800\/50 {
+  @apply bg-white/90;
+}
+
+/* Input light mode */
+.light input,
+.light select,
+.light textarea {
+  @apply bg-white text-gray-900 border-gray-300;
+}
+
+.light input:focus,
+.light select:focus,
+.light textarea:focus {
+  @apply border-purple-500 ring-purple-500;
+}
+
+/* Button light mode adjustments */
+.light .bg-purple-600 {
+  @apply bg-purple-600;
+}
+
+.light .bg-purple-600:hover {
+  @apply bg-purple-700;
+}
+
+/* Skeleton loader light mode */
+.light .animate-pulse {
+  @apply bg-gray-200;
+}
+
+/* Scrollbar light mode */
+.light ::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.light ::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}

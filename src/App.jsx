@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { Toaster } from 'react-hot-toast';
 
 // Layouts
@@ -11,86 +13,110 @@ import AdminLayout from './components/AdminLayout';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 
-// Halaman Publik
-import HomePage from './pages/HomePage';
-import SemuaAkunPage from './pages/SemuaAkunPage';
-import AkunDetailPage from './pages/AkunDetailPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage'; 
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import TopUpPage from './pages/TopUpPage';
-import TopUpDetailPage from './pages/TopUpDetailPage';
+// Error Handling
+import ErrorBoundary from './components/ErrorBoundary';
 
-// Halaman User
-import ProfilePage from './pages/ProfilePage';
-import FavoritPage from './pages/FavoritPage';
-import PaymentPage from './pages/PaymentPage';
-import PurchaseDetailPage from './pages/PurchaseDetailPage';
-import ReviewPage from './pages/ReviewPage';
-import TopUpPaymentPage from './pages/TopUpPaymentPage';
+// Code splitting with React.lazy for better performance
+import { lazy, Suspense } from 'react';
+import { ProductCardSkeleton } from './components/LoadingSkeleton';
 
-// Halaman Admin 
-import DashboardHomePage from './pages/admin/DashboardHomePage';
-import ManageOrdersPage from './pages/admin/ManageOrdersPage';
-import ManageProductsPage from './pages/admin/ManageProductsPage';
-import ProductAddChoicePage from './pages/admin/ProductAddChoicePage';
-import ProductAddTopUpPage from './pages/admin/ProductAddTopUpPage';
-import ProductAddAkunPage from './pages/admin/ProductAddAkunPage';
-import ProductEditAkunPage from './pages/admin/ProductEditAkunPage';
-import ProductEditTopUpPage from './pages/admin/ProductEditTopUpPage';
-import ManageCouponsPage from './pages/admin/ManageCouponsPage';
-import CouponAddPage from './pages/admin/CouponAddPage';
+// Halaman Publik - Lazy loaded
+const HomePage = lazy(() => import('./pages/HomePage'));
+const SemuaAkunPage = lazy(() => import('./pages/SemuaAkunPage'));
+const AkunDetailPage = lazy(() => import('./pages/AkunDetailPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const TopUpPage = lazy(() => import('./pages/TopUpPage'));
+const TopUpDetailPage = lazy(() => import('./pages/TopUpDetailPage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+
+// Halaman User - Lazy loaded
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const FavoritPage = lazy(() => import('./pages/FavoritPage'));
+const PaymentPage = lazy(() => import('./pages/PaymentPage'));
+const PurchaseDetailPage = lazy(() => import('./pages/PurchaseDetailPage'));
+const ReviewPage = lazy(() => import('./pages/ReviewPage'));
+const TopUpPaymentPage = lazy(() => import('./pages/TopUpPaymentPage'));
+
+// Halaman Admin - Lazy loaded
+const DashboardHomePage = lazy(() => import('./pages/admin/DashboardHomePage'));
+const AnalyticsPage = lazy(() => import('./pages/admin/AnalyticsPage'));
+const ManageOrdersPage = lazy(() => import('./pages/admin/ManageOrdersPage'));
+const ManageProductsPage = lazy(() => import('./pages/admin/ManageProductsPage'));
+const ProductAddChoicePage = lazy(() => import('./pages/admin/ProductAddChoicePage'));
+const ProductAddTopUpPage = lazy(() => import('./pages/admin/ProductAddTopUpPage'));
+const ProductAddAkunPage = lazy(() => import('./pages/admin/ProductAddAkunPage'));
+const ProductEditAkunPage = lazy(() => import('./pages/admin/ProductEditAkunPage'));
+const ProductEditTopUpPage = lazy(() => import('./pages/admin/ProductEditTopUpPage'));
+const ManageCouponsPage = lazy(() => import('./pages/admin/ManageCouponsPage'));
+const CouponAddPage = lazy(() => import('./pages/admin/CouponAddPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+    <div className="text-center">
+      <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
+      <p className="text-gray-400">Memuat halaman...</p>
+    </div>
+  </div>
+);
 
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <Toaster 
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: '#333',
-              color: '#fff',
-            },
-            success: {
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
+    <ErrorBoundary>
+      <ThemeProvider>
+        <LanguageProvider>
+          <Router>
+            <AuthProvider>
+              <Toaster 
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: '#333',
+                color: '#fff',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
+              success: {
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-        />
-        <Routes>
+              error: {
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          <Routes>
           {/*R ute Publik & User */}
           <Route path="/" element={<Layout />}>
             
             {/* Rute Publik */}
-            <Route index element={<HomePage />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="lupa-password" element={<ForgotPasswordPage />} />
-            <Route path="reset-password/:uid/:token" element={<ResetPasswordPage />} />
-            <Route path="semua-akun" element={<SemuaAkunPage />} />
-            <Route path="akun/:accountId" element={<AkunDetailPage />} />
-            <Route path="top-up" element={<TopUpPage />} />
-            <Route path="top-up/:productId" element={<TopUpDetailPage />} />
+            <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
+            <Route path="login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
+            <Route path="register" element={<Suspense fallback={<PageLoader />}><RegisterPage /></Suspense>} />
+            <Route path="lupa-password" element={<Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense>} />
+            <Route path="reset-password/:uid/:token" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
+            <Route path="search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
+            <Route path="semua-akun" element={<Suspense fallback={<PageLoader />}><SemuaAkunPage /></Suspense>} />
+            <Route path="akun/:accountId" element={<Suspense fallback={<PageLoader />}><AkunDetailPage /></Suspense>} />
+            <Route path="top-up" element={<Suspense fallback={<PageLoader />}><TopUpPage /></Suspense>} />
+            <Route path="top-up/:productId" element={<Suspense fallback={<PageLoader />}><TopUpDetailPage /></Suspense>} />
 
             {/* Rute User (Harus Login) */}
             <Route element={<PrivateRoute />}>
-              <Route path="profil" element={<ProfilePage />} />
-              <Route path="favorit" element={<FavoritPage />} />
-              <Route path="bayar/:accountId" element={<PaymentPage />} />
-              <Route path="top-up/bayar/:productId" element={<TopUpPaymentPage />} />
-              <Route path="profil/pesanan/:kodeTransaksi" element={<PurchaseDetailPage />} />
-              <Route path="pembelian/:purchaseId/ulasan" element={<ReviewPage />} />
+              <Route path="profil" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
+              <Route path="favorit" element={<Suspense fallback={<PageLoader />}><FavoritPage /></Suspense>} />
+              <Route path="bayar/:accountId" element={<Suspense fallback={<PageLoader />}><PaymentPage /></Suspense>} />
+              <Route path="top-up/bayar/:productId" element={<Suspense fallback={<PageLoader />}><TopUpPaymentPage /></Suspense>} />
+              <Route path="profil/pesanan/:kodeTransaksi" element={<Suspense fallback={<PageLoader />}><PurchaseDetailPage /></Suspense>} />
+              <Route path="pembelian/:purchaseId/ulasan" element={<Suspense fallback={<PageLoader />}><ReviewPage /></Suspense>} />
             </Route>
 
           </Route>
@@ -98,22 +124,28 @@ function App() {
           {/* Rute Admin  */}
           <Route element={<AdminRoute />}>
             <Route path="/dashboard" element={<AdminLayout />}>
-              <Route index element={<DashboardHomePage />} />
-              <Route path="pesanan" element={<ManageOrdersPage />} />
-              <Route path="produk" element={<ManageProductsPage />} />
-              <Route path="produk/tambah" element={<ProductAddChoicePage />} />
-              <Route path="produk/tambah-topup" element={<ProductAddTopUpPage />} />
-              <Route path="produk/tambah-akun" element={<ProductAddAkunPage />} />
-              <Route path="produk/edit-akun/:id" element={<ProductEditAkunPage />} />
-              <Route path="produk/edit-topup/:id" element={<ProductEditTopUpPage />} />
-              <Route path="kupon" element={<ManageCouponsPage />} />
-              <Route path="kupon/tambah" element={<CouponAddPage />} />
+              <Route index element={<Suspense fallback={<PageLoader />}><DashboardHomePage /></Suspense>} />
+              <Route path="analytics" element={<Suspense fallback={<PageLoader />}><AnalyticsPage /></Suspense>} />
+              <Route path="pesanan" element={<Suspense fallback={<PageLoader />}><ManageOrdersPage /></Suspense>} />
+              <Route path="produk" element={<Suspense fallback={<PageLoader />}><ManageProductsPage /></Suspense>} />
+              <Route path="produk/tambah" element={<Suspense fallback={<PageLoader />}><ProductAddChoicePage /></Suspense>} />
+              <Route path="produk/tambah-topup" element={<Suspense fallback={<PageLoader />}><ProductAddTopUpPage /></Suspense>} />
+              <Route path="produk/tambah-akun" element={<Suspense fallback={<PageLoader />}><ProductAddAkunPage /></Suspense>} />
+              <Route path="produk/edit-akun/:id" element={<Suspense fallback={<PageLoader />}><ProductEditAkunPage /></Suspense>} />
+              <Route path="produk/edit-topup/:id" element={<Suspense fallback={<PageLoader />}><ProductEditTopUpPage /></Suspense>} />
+              <Route path="kupon" element={<Suspense fallback={<PageLoader />}><ManageCouponsPage /></Suspense>} />
+              <Route path="kupon/tambah" element={<Suspense fallback={<PageLoader />}><CouponAddPage /></Suspense>} />
             </Route>
           </Route>
 
+          {/* 404 Route - Harus di akhir */}
+          <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFoundPage /></Suspense>} />
         </Routes>
       </AuthProvider>
     </Router>
+    </LanguageProvider>
+    </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 export default App;

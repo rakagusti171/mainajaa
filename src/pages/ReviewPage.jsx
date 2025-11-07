@@ -4,7 +4,7 @@ import apiClient from '../api/axiosConfig';
 
 const StarIcon = ({ filled, onClick }) => (
   <svg 
-    className={`w-10 h-10 cursor-pointer ${filled ? 'text-yellow-400' : 'text-gray-600'}`} 
+    className={`w-8 h-8 sm:w-10 sm:h-10 cursor-pointer ${filled ? 'text-yellow-400' : 'text-gray-600'}`} 
     fill="currentColor" 
     viewBox="0 0 20 20"
     onClick={onClick}
@@ -42,10 +42,10 @@ function ReviewPage() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-12 max-w-2xl">
-      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-white mb-6">Beri Ulasan</h1>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-2xl">
+      <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">Beri Ulasan</h1>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Rating Anda</label>
             <div className="flex space-x-1">
@@ -65,7 +65,7 @@ function ReviewPage() {
               value={ulasan}
               onChange={(e) => setUlasan(e.target.value)}
               rows="4"
-              className="mt-1 w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-gray-200"
+              className="mt-1 w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-gray-200 text-sm sm:text-base"
               placeholder="Bagaimana pengalaman Anda dengan akun ini?"
             ></textarea>
           </div>
@@ -75,7 +75,7 @@ function ReviewPage() {
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-md disabled:opacity-50"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-md disabled:opacity-50 text-base sm:text-lg"
           >
             {isSubmitting ? 'Mengirim...' : 'Kirim Ulasan'}
           </button>

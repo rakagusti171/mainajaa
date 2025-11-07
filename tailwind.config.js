@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}", // Ini akan memindai semua file di dalam folder src
   ],
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {},
   },

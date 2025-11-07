@@ -4,6 +4,8 @@ import apiClient from '../api/axiosConfig';
 import AuthContext from '../context/AuthContext';
 import { HeartIcon as HeartIconOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
+import LazyImage from '../components/LazyImage';
+import { ProductCardSkeleton } from '../components/LoadingSkeleton';
 
 function AkunDetailPage() {
   const { accountId } = useParams();
@@ -100,10 +102,10 @@ function AkunDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="md:col-span-2 space-y-8">
           <div>
-            <img 
+            <LazyImage 
               src={selectedImage}
               alt={account.nama_akun} 
-              className="w-full h-auto max-h-[500px] object-cover rounded-lg mb-4 border border-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
+              className="w-full h-auto max-h-[300px] sm:max-h-[400px] md:max-h-[500px] object-cover rounded-lg mb-4 border border-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
               onClick={openModal} 
             />
             {allImages.length > 1 && (
@@ -112,11 +114,12 @@ function AkunDetailPage() {
                   <button 
                     key={img.id}
                     onClick={() => setSelectedImage(img.gambar)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-md border-2 transition-all ${
+                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-md border-2 transition-all ${
                         selectedImage === img.gambar ? 'border-purple-500' : 'border-gray-600 hover:border-gray-400'
                     }`}
+                    aria-label={`Select image ${img.id}`}
                   >
-                    <img 
+                    <LazyImage 
                       src={img.gambar} 
                       alt="thumbnail" 
                       className="w-full h-full object-cover rounded-sm"

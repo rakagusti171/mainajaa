@@ -142,62 +142,62 @@ function TopUpPaymentPage() {
     }
   };
 
-  if (loading) return <div className="text-center p-20 text-gray-400">Memuat checkout...</div>;
-  if (!product) return <div className="text-center p-20 text-gray-400">Gagal memuat detail produk.</div>;
+  if (loading) return <div className="text-center p-12 sm:p-20 text-gray-400 text-sm sm:text-base">Memuat checkout...</div>;
+  if (!product) return <div className="text-center p-12 sm:p-20 text-gray-400 text-sm sm:text-base">Gagal memuat detail produk.</div>;
 
   const formatHarga = (harga) => `Rp ${parseFloat(harga).toLocaleString('id-ID')}`;
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <h1 className="text-3xl font-bold text-white mb-8">Checkout Top Up</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">Checkout Top Up</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         <div className="md:col-span-1">
-          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-3">
-            <h2 className="text-xl font-semibold text-white mb-4">Ringkasan Pesanan</h2>
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6 space-y-3">
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Ringkasan Pesanan</h2>
             <div>
-              <label className="text-sm text-gray-400">Produk:</label>
-              <p className="text-md text-white">{product.nama_paket}</p>
+              <label className="text-xs sm:text-sm text-gray-400">Produk:</label>
+              <p className="text-sm sm:text-md text-white">{product.nama_paket}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-400">Game:</label>
-              <p className="text-md text-white">{product.game}</p>
+              <label className="text-xs sm:text-sm text-gray-400">Game:</label>
+              <p className="text-sm sm:text-md text-white">{product.game}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-400">User ID:</label>
-              <p className="text-md text-white">{gameUserId} {gameZoneId ? `(${gameZoneId})` : ''}</p>
+              <label className="text-xs sm:text-sm text-gray-400">User ID:</label>
+              <p className="text-sm sm:text-md text-white">{gameUserId} {gameZoneId ? `(${gameZoneId})` : ''}</p>
             </div>
              <div>
-              <label className="text-sm text-gray-400">Nickname:</label>
-              <p className="text-md font-semibold text-white">{nickname}</p>
+              <label className="text-xs sm:text-sm text-gray-400">Nickname:</label>
+              <p className="text-sm sm:text-md font-semibold text-white">{nickname}</p>
             </div>
           </div>
         </div>
 
         <div className="md:col-span-2">
-          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-8">
-            <h2 className="text-xl font-semibold text-white mb-4">Metode Pembayaran</h2>
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 sm:p-6 lg:p-8">
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Metode Pembayaran</h2>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-1">Kode Kupon (Opsional)</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={couponCode}
                   onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); setAppliedCoupon(null); setFinalPrice(parseFloat(product.harga)); }} // Reset saat diketik
                   placeholder="Masukkan kode kupon"
-                  className="flex-grow bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-gray-200 uppercase focus:border-purple-500 focus:ring-purple-500"
+                  className="flex-grow bg-gray-800 border border-gray-600 rounded-md py-2 px-3 text-gray-200 uppercase focus:border-purple-500 focus:ring-purple-500 text-sm sm:text-base"
                   disabled={isApplyingCoupon}
                 />
                 <button
                   onClick={handleApplyCoupon}
                   disabled={!couponCode || isApplyingCoupon}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md disabled:opacity-50"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 sm:px-4 rounded-md disabled:opacity-50 whitespace-nowrap text-sm sm:text-base"
                 >
                   {isApplyingCoupon ? 'Memeriksa...' : 'Terapkan'}
                 </button>
               </div>
-              {couponError && <p className="text-red-400 text-sm mt-1">{couponError}</p>}
+              {couponError && <p className="text-red-400 text-xs sm:text-sm mt-1">{couponError}</p>}
               {appliedCoupon && (
-                <p className="text-green-400 text-sm mt-1">
+                <p className="text-green-400 text-xs sm:text-sm mt-1">
                   Kupon {appliedCoupon.kode_kupon} diterapkan! Diskon Rp {parseFloat(appliedCoupon.diskon_amount).toLocaleString('id-ID')}
                 </p>
               )}
@@ -205,18 +205,18 @@ function TopUpPaymentPage() {
 
             <div className="border-t border-gray-700 pt-4 space-y-2">
                {appliedCoupon && (
-                 <div className="flex justify-between text-gray-300">
+                 <div className="flex justify-between text-sm sm:text-base text-gray-300">
                     <span>Harga Asli:</span>
                     <span>{formatHarga(product.harga)}</span>
                  </div>
                )}
                {appliedCoupon && (
-                 <div className="flex justify-between text-gray-300">
+                 <div className="flex justify-between text-sm sm:text-base text-gray-300">
                     <span>Diskon ({appliedCoupon.kode_kupon}):</span>
                     <span className="text-red-400">- {formatHarga(appliedCoupon.diskon_amount)}</span>
                  </div>
                )}
-               <div className="flex justify-between text-xl font-bold text-purple-400 pt-2">
+               <div className="flex justify-between text-lg sm:text-xl font-bold text-purple-400 pt-2">
                  <span>Total Bayar:</span>
                  <span>{formatHarga(finalPrice)}</span>
                </div>
@@ -225,7 +225,7 @@ function TopUpPaymentPage() {
             <button
               onClick={handlePayment}
               disabled={loading || isProcessingPayment}
-              className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md text-lg disabled:opacity-50"
+              className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md text-base sm:text-lg disabled:opacity-50"
             >
               {isProcessingPayment ? 'Memproses...' : 'Bayar Sekarang'}
             </button>

@@ -25,14 +25,15 @@ function AdminLayout() {
           <Link to="/dashboard" className={getLinkClass('/dashboard', true)}>
             Dashboard
           </Link>
+          <Link to="/dashboard/analytics" className={getLinkClass('/dashboard/analytics')}>
+            Analytics
+          </Link>
           <Link to="/dashboard/pesanan" className={getLinkClass('/dashboard/pesanan')}>
             Kelola Pesanan
           </Link>
           <Link to="/dashboard/produk" className={getLinkClass('/dashboard/produk')}>
             Kelola Produk
           </Link>
-          
-          {/* --- TAMBAHKAN LINK BARU DI SINI --- */}
           <Link to="/dashboard/kupon" className={getLinkClass('/dashboard/kupon')}>
             Kelola Kupon
           </Link>

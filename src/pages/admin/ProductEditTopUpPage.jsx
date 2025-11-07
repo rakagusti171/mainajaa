@@ -77,12 +77,12 @@ function ProductEditTopUpPage() {
   };
 
   if (loading && !formData.nama_paket) {
-    return <div className="p-8 text-gray-400">Memuat data produk...</div>;
+    return <div className="p-4 sm:p-6 lg:p-8 text-gray-400 text-sm sm:text-base">Memuat data produk...</div>;
   }
 
   return (
-    <div className="p-8 text-white">
-      <h1 className="text-3xl font-bold mb-6">Edit Produk Top Up: {formData.nama_paket}</h1>
+    <div className="p-4 sm:p-6 lg:p-8 text-white">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Edit Produk Top Up: {formData.nama_paket}</h1>
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
         <div>
@@ -136,17 +136,17 @@ function ProductEditTopUpPage() {
            <p className="text-xs text-gray-400">Upload file baru untuk mengganti gambar di atas.</p>
         </div>
 
-        <div className="flex space-x-4 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md disabled:opacity-50"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 sm:px-6 rounded-md disabled:opacity-50 text-sm sm:text-base"
           >
             {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
           </button>
           <Link
             to="/dashboard/produk"
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-md"
+            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 sm:px-6 rounded-md text-center text-sm sm:text-base"
           >
             Batal
           </Link>

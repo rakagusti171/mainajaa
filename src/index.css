@@ -64,7 +64,7 @@ body {
 }
 
 .light .text-gray-500 {
-  @apply text-gray-500;
+  color: rgb(107 114 128); /* text-gray-500 equivalent */
 }
 
 .light .border-gray-700 {
@@ -104,11 +104,11 @@ body {
 
 /* Button light mode adjustments */
 .light .bg-purple-600 {
-  @apply bg-purple-600;
+  background-color: rgb(147 51 234); /* bg-purple-600 equivalent */
 }
 
 .light .bg-purple-600:hover {
-  @apply bg-purple-700;
+  background-color: rgb(126 34 206); /* bg-purple-700 equivalent */
 }
 
 /* Skeleton loader light mode */

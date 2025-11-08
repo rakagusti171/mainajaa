@@ -1,11 +1,10 @@
 import axios from 'axios';
 
-// 1. Kita definisikan variabel 'API_URL' di sini
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
+const API_URL = import.meta.env.VITE_API_URL?.trim() || 'https://mainajaa-backend-production.up.railway.app/api';
 
 const apiClient = axios.create({
-  // 2. Kita gunakan variabel 'API_URL' itu di sini
-  baseURL: API_URL 
+  baseURL: API_URL,
+  withCredentials: true, // 🔥 penting buat CORS agar cookie/token bisa ikut dikirim
 });
 
 // Request interceptor - Add token to headers
@@ -24,48 +23,36 @@ apiClient.interceptors.request.use(
     }
     return req;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor - Handle token refresh on 401 errors
+// Response interceptor - Refresh token
 let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
   });
-  
   failedQueue = [];
 };
 
 apiClient.interceptors.response.use(
-  (res) => {
-    return res;
-  },
+  (res) => res,
   async (err) => {
     const originalRequest = err.config;
 
-    // If error is 401 and we haven't tried to refresh yet
     if (err.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then(token => {
+          .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return apiClient(originalRequest);
           })
-          .catch(err => {
-            return Promise.reject(err);
-          });
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -75,7 +62,6 @@ apiClient.interceptors.response.use(
       if (!authTokens) {
         processQueue(err, null);
         isRefreshing = false;
-        // Redirect to login
         window.location.href = '/login';
         return Promise.reject(err);
       }
@@ -83,7 +69,7 @@ apiClient.interceptors.response.use(
       try {
         const parsed = JSON.parse(authTokens);
         const response = await axios.post(`${API_URL}/token/refresh/`, {
-          refresh: parsed.refresh
+          refresh: parsed.refresh,
         });
 
         const { access } = response.data;

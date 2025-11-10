@@ -52,6 +52,14 @@ function PaymentPage() {
         navigate('/login');
         return;
       }
+      
+      // Pastikan token ada di localStorage
+      const authTokens = localStorage.getItem('authTokens');
+      if (!authTokens) {
+        toast.error(t('mustLogin'));
+        navigate('/login');
+        return;
+      }
       try {
         setLoading(true);
         const res = await apiClient.get(`/accounts/${accountId}/`);
@@ -135,6 +143,21 @@ function PaymentPage() {
         return;
      }
      
+     // Pastikan user sudah login
+     if (!user) {
+        toast.error(t('mustLogin'));
+        navigate('/login');
+        return;
+     }
+     
+     // Pastikan token ada
+     const authTokens = localStorage.getItem('authTokens');
+     if (!authTokens) {
+        toast.error(t('mustLogin'));
+        navigate('/login');
+        return;
+     }
+     
      // Validate payment method requirements
      if (paymentMethod === 'MIDTRANS' && !window.snap) {
         toast.error(t('paymentNotReady'));
@@ -188,6 +211,16 @@ function PaymentPage() {
       }
     } catch (err) {
       console.error("Payment error:", err);
+      
+      // Handle 401 Unauthorized - redirect to login
+      if (err.response?.status === 401) {
+        toast.error(t('mustLogin'));
+        localStorage.removeItem('authTokens');
+        navigate('/login');
+        setIsProcessing(false);
+        return;
+      }
+      
       toast.error(t('transactionFailed') + ' ' + (err.response?.data?.error || t('serverError')));
       setIsProcessing(false);
     }

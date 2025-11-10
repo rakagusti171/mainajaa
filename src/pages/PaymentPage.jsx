@@ -26,6 +26,9 @@ function PaymentPage() {
   const [hargaAsli, setHargaAsli] = useState(0);
   const [diskonAmount, setDiskonAmount] = useState(0);
   const [hargaFinal, setHargaFinal] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState('MIDTRANS');
+  const [cryptoPaymentData, setCryptoPaymentData] = useState(null);
+  const [showCryptoDetails, setShowCryptoDetails] = useState(false);
 
   useEffect(() => {
     let scriptAdded = false;
@@ -131,7 +134,9 @@ function PaymentPage() {
         toast.error(t('accountDataNotLoaded'));
         return;
      }
-     if (!window.snap) {
+     
+     // Validate payment method requirements
+     if (paymentMethod === 'MIDTRANS' && !window.snap) {
         toast.error(t('paymentNotReady'));
         return;
      }
@@ -141,36 +146,76 @@ function PaymentPage() {
       const res = await apiClient.post(`/pembelian/create-akun/`, {
         akun_id: accountId,
         kode_kupon: appliedCoupon,
+        payment_method: paymentMethod,
       });
 
-      const midtransToken = res.data.midtrans_token;
-
-      if (midtransToken) {
-        window.snap.pay(midtransToken, {
-          onSuccess: function(result){
-            toast.success(t('paymentSuccess'));
-            navigate('/profil');
-          },
-          onPending: function(result){
-            toast(t('waitingPayment'), { icon: '⏳' });
-            navigate('/profil');
-          },
-          onError: function(result){
-            toast.error(t('paymentFailedMsg'));
-            setIsProcessing(false);
-          },
-          onClose: function(){
-            toast.info(t('paymentClosed'));
-            setIsProcessing(false);
-          }
-        });
+      // Handle Midtrans payment
+      if (paymentMethod === 'MIDTRANS') {
+        const midtransToken = res.data.midtrans_token;
+        if (midtransToken) {
+          window.snap.pay(midtransToken, {
+            onSuccess: function(result){
+              toast.success(t('paymentSuccess'));
+              navigate('/profil');
+            },
+            onPending: function(result){
+              toast(t('waitingPayment'), { icon: '⏳' });
+              navigate('/profil');
+            },
+            onError: function(result){
+              toast.error(t('paymentFailedMsg'));
+              setIsProcessing(false);
+            },
+            onClose: function(){
+              toast.info(t('paymentClosed'));
+              setIsProcessing(false);
+            }
+          });
+        } else {
+          throw new Error(t('invalidToken'));
+        }
       } else {
-         throw new Error(t('invalidToken'));
+        // Handle Crypto payment
+        setCryptoPaymentData({
+          kode_transaksi: res.data.kode_transaksi,
+          crypto_address: res.data.crypto_address,
+          crypto_amount: res.data.crypto_amount,
+          crypto_currency: res.data.crypto_currency,
+          harga_total: res.data.harga_total,
+        });
+        setShowCryptoDetails(true);
+        setIsProcessing(false);
       }
     } catch (err) {
       console.error("Payment error:", err);
       toast.error(t('transactionFailed') + ' ' + (err.response?.data?.error || t('serverError')));
       setIsProcessing(false);
+    }
+  };
+
+  const handleCopyAddress = () => {
+    if (cryptoPaymentData?.crypto_address) {
+      navigator.clipboard.writeText(cryptoPaymentData.crypto_address);
+      toast.success('Wallet address berhasil disalin!');
+    }
+  };
+
+  const handleSubmitTxHash = async () => {
+    const txHash = document.getElementById('tx_hash').value;
+    if (!txHash) {
+      toast.error('Masukkan transaction hash');
+      return;
+    }
+
+    try {
+      const res = await apiClient.post('/pembelian/verify-crypto/', {
+        kode_transaksi: cryptoPaymentData.kode_transaksi,
+        tx_hash: txHash,
+      });
+      toast.success(res.data.message || 'Transaction hash berhasil disubmit. Admin akan memverifikasi pembayaran Anda.');
+      navigate('/profil');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Gagal submit transaction hash');
     }
   };
 
@@ -212,6 +257,58 @@ function PaymentPage() {
 
         <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-white mb-4">{t('paymentMethod')}</h2>
+          
+          {/* Payment Method Selection */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-3">Pilih Metode Pembayaran</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setPaymentMethod('MIDTRANS')}
+                className={`p-3 rounded-md border-2 transition-all ${
+                  paymentMethod === 'MIDTRANS'
+                    ? 'border-purple-500 bg-purple-500/20'
+                    : 'border-gray-600 hover:border-gray-500'
+                }`}
+              >
+                <div className="text-white font-semibold">💳 Midtrans</div>
+                <div className="text-xs text-gray-400 mt-1">Bank, E-Wallet, dll</div>
+              </button>
+              <button
+                onClick={() => setPaymentMethod('CRYPTO_USDT')}
+                className={`p-3 rounded-md border-2 transition-all ${
+                  paymentMethod === 'CRYPTO_USDT'
+                    ? 'border-purple-500 bg-purple-500/20'
+                    : 'border-gray-600 hover:border-gray-500'
+                }`}
+              >
+                <div className="text-white font-semibold">₮ USDT</div>
+                <div className="text-xs text-gray-400 mt-1">Crypto Payment</div>
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              <button
+                onClick={() => setPaymentMethod('CRYPTO_ETH')}
+                className={`p-2 rounded-md border-2 transition-all text-xs ${
+                  paymentMethod === 'CRYPTO_ETH'
+                    ? 'border-purple-500 bg-purple-500/20'
+                    : 'border-gray-600 hover:border-gray-500'
+                }`}
+              >
+                <div className="text-white font-semibold">Ξ ETH</div>
+              </button>
+              <button
+                onClick={() => setPaymentMethod('CRYPTO_SOL')}
+                className={`p-2 rounded-md border-2 transition-all text-xs ${
+                  paymentMethod === 'CRYPTO_SOL'
+                    ? 'border-purple-500 bg-purple-500/20'
+                    : 'border-gray-600 hover:border-gray-500'
+                }`}
+              >
+                <div className="text-white font-semibold">◎ SOL</div>
+              </button>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300">{t('couponCode')}</label>
             <div className="flex space-x-2 mt-1">
@@ -255,13 +352,87 @@ function PaymentPage() {
 
           <button
             onClick={handlePayment}
-            disabled={isProcessing || loading}
+            disabled={isProcessing || loading || showCryptoDetails}
             className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-md text-lg disabled:opacity-50"
           >
-            {isProcessing ? t('processing') : t('payNow')}
+            {isProcessing ? t('processing') : showCryptoDetails ? 'Pesanan Dibuat' : t('payNow')}
           </button>
         </div>
       </div>
+
+      {/* Crypto Payment Details Modal */}
+      {showCryptoDetails && cryptoPaymentData && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 max-w-md w-full">
+            <h2 className="text-2xl font-bold text-white mb-4">Detail Pembayaran Crypto</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Kode Transaksi</label>
+                <p className="text-white font-mono bg-gray-900 px-3 py-2 rounded">{cryptoPaymentData.kode_transaksi}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Jumlah yang Harus Dibayar</label>
+                <p className="text-white text-xl font-bold">
+                  {cryptoPaymentData.crypto_amount} {cryptoPaymentData.crypto_currency}
+                </p>
+                <p className="text-gray-400 text-sm">≈ Rp {cryptoPaymentData.harga_total?.toLocaleString('id-ID')}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Wallet Address</label>
+                <div className="flex items-center space-x-2">
+                  <p className="text-white font-mono bg-gray-900 px-3 py-2 rounded flex-1 break-all text-sm">
+                    {cryptoPaymentData.crypto_address}
+                  </p>
+                  <button
+                    onClick={handleCopyAddress}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded"
+                  >
+                    Salin
+                  </button>
+                </div>
+              </div>
+              
+              <div className="bg-yellow-900/30 border border-yellow-700 rounded p-3">
+                <p className="text-yellow-400 text-sm">
+                  ⚠️ Pastikan Anda mengirim <strong>tepat {cryptoPaymentData.crypto_amount} {cryptoPaymentData.crypto_currency}</strong> ke address di atas. 
+                  Setelah pembayaran, submit transaction hash Anda di bawah.
+                </p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Transaction Hash</label>
+                <input
+                  id="tx_hash"
+                  type="text"
+                  placeholder="Masukkan transaction hash setelah pembayaran"
+                  className="w-full bg-gray-900 border border-gray-600 rounded-md py-2 px-3 text-gray-200 focus:border-purple-500"
+                />
+              </div>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleSubmitTxHash}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md"
+                >
+                  Submit Transaction Hash
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCryptoDetails(false);
+                    navigate('/profil');
+                  }}
+                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md"
+                >
+                  Lihat di Profil
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

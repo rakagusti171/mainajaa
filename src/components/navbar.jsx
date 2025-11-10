@@ -2,8 +2,9 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import CartContext from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import ThemeToggle from './ThemeToggle';
 import LanguageToggle from './LanguageToggle';
 
@@ -16,6 +17,7 @@ const ChevronDownIcon = () => (
 
 function Navbar() {
   const { user, logoutUser } = useContext(AuthContext);
+  const { cartCount } = useContext(CartContext);
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -78,8 +80,23 @@ function Navbar() {
             <LanguageToggle />
           </div>
 
-          {/* 5. Tombol Login/Register & Dropdown (Sembunyi di HP) */}
+          {/* 5. Cart Icon & Login/Register & Dropdown (Sembunyi di HP) */}
           <div className="hidden md:flex items-center space-x-4 flex-shrink-0">
+          {user && (
+            // Cart Icon
+            <Link
+              to="/cart"
+              className="relative text-gray-300 hover:text-white focus:outline-none p-2"
+              aria-label="Cart"
+            >
+              <ShoppingCartIcon className="w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartCount > 9 ? '9+' : cartCount}
+                </span>
+              )}
+            </Link>
+          )}
           {user ? (
             // Dropdown User
             <div className="relative">
@@ -173,6 +190,24 @@ function Navbar() {
                 <ThemeToggle />
                 <LanguageToggle />
               </div>
+
+              {/* Cart Icon Mobile */}
+              {user && (
+                <Link
+                  to="/cart"
+                  onClick={closeAllMenus}
+                  className="flex items-center text-gray-300 hover:text-white block py-2"
+                  aria-label="Cart"
+                >
+                  <ShoppingCartIcon className="w-5 h-5 mr-2" />
+                  {t('cart')}
+                  {cartCount > 0 && (
+                    <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartCount > 9 ? '9+' : cartCount}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               {/* Tombol Login/User HP */}
               {user ? (

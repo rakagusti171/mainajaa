@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Toaster } from 'react-hot-toast';
@@ -39,6 +40,7 @@ const PaymentPage = lazy(() => import('./pages/PaymentPage'));
 const PurchaseDetailPage = lazy(() => import('./pages/PurchaseDetailPage'));
 const ReviewPage = lazy(() => import('./pages/ReviewPage'));
 const TopUpPaymentPage = lazy(() => import('./pages/TopUpPaymentPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
 
 // Halaman Admin - Lazy loaded
 const DashboardHomePage = lazy(() => import('./pages/admin/DashboardHomePage'));
@@ -72,6 +74,7 @@ function App() {
         <LanguageProvider>
           <Router>
             <AuthProvider>
+              <CartProvider>
               <Toaster 
             position="bottom-right"
             toastOptions={{
@@ -113,6 +116,7 @@ function App() {
             <Route element={<PrivateRoute />}>
               <Route path="profil" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
               <Route path="favorit" element={<Suspense fallback={<PageLoader />}><FavoritPage /></Suspense>} />
+              <Route path="cart" element={<Suspense fallback={<PageLoader />}><CartPage /></Suspense>} />
               <Route path="bayar/:accountId" element={<Suspense fallback={<PageLoader />}><PaymentPage /></Suspense>} />
               <Route path="top-up/bayar/:productId" element={<Suspense fallback={<PageLoader />}><TopUpPaymentPage /></Suspense>} />
               <Route path="profil/pesanan/:kodeTransaksi" element={<Suspense fallback={<PageLoader />}><PurchaseDetailPage /></Suspense>} />
@@ -141,6 +145,7 @@ function App() {
           {/* 404 Route - Harus di akhir */}
           <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFoundPage /></Suspense>} />
         </Routes>
+      </CartProvider>
       </AuthProvider>
     </Router>
     </LanguageProvider>

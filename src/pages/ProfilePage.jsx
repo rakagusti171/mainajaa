@@ -128,34 +128,54 @@ const RiwayatPembelianTab = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {riwayat.map(item => (
-                        <tr key={item.kode_transaksi} className="bg-gray-800/60 border-b border-gray-700 hover:bg-gray-700/60">
-                            <td className="px-6 py-4 font-medium text-white whitespace-nowrap">
-                                {item.nama_item}
-                                <span className={`ml-2 text-xs ${item.tipe === 'Akun' ? 'text-purple-400' : 'text-blue-400'}`}>
-                                    ({item.tipe})
-                                </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">{formatTanggal(item.tanggal)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{formatHarga(item.total)}</td>
-                            <td className="px-6 py-4"><StatusBadge status={item.status} /></td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                {item.status === 'PENDING' && (
-                                    <button onClick={() => handleLanjutkanBayar(item.midtrans_token)} className="font-medium text-blue-400 hover:underline">
-                                        {t('continuePayment')}
-                                    </button>
-                                )}
-                                {item.status === 'COMPLETED' && (
-                                    <Link to={`/profil/pesanan/${item.kode_transaksi}`} className="font-medium text-green-400 hover:underline">
-                                        {t('viewDetail')}
-                                    </Link>
-                                )}
-                                 {item.status === 'CANCELED' && (
-                                    <span className="text-gray-500">{t('canceled')}</span>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
+                    {riwayat.map(item => {
+                        // Handle cart order
+                        const isCartOrder = item.tipe === 'CART' || item.is_cart_order;
+                        const itemKey = item.kode_transaksi || `${item.tipe}-${item.id}`;
+                        
+                        return (
+                            <tr key={itemKey} className="bg-gray-800/60 border-b border-gray-700 hover:bg-gray-700/60">
+                                <td className="px-6 py-4 font-medium text-white">
+                                    <div className="flex items-center gap-2">
+                                        {isCartOrder && (
+                                            <span className="px-2 py-0.5 text-xs font-semibold bg-purple-600/50 text-purple-300 rounded border border-purple-500">
+                                                CART
+                                            </span>
+                                        )}
+                                        {item.from_cart_order && (
+                                            <span className="px-2 py-0.5 text-xs font-semibold bg-gray-600/50 text-gray-300 rounded border border-gray-500">
+                                                Dari Cart
+                                            </span>
+                                        )}
+                                        <span>{item.nama_item}</span>
+                                        {!isCartOrder && (
+                                            <span className={`ml-2 text-xs ${item.tipe === 'akun' || item.tipe === 'Akun' ? 'text-purple-400' : item.tipe === 'topup' || item.tipe === 'TOPUP' ? 'text-blue-400' : 'text-gray-400'}`}>
+                                                ({item.tipe})
+                                            </span>
+                                        )}
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">{formatTanggal(item.tanggal || item.dibuat_pada)}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{formatHarga(item.total || item.harga_total || item.harga_pembelian)}</td>
+                                <td className="px-6 py-4"><StatusBadge status={item.status} /></td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {item.status === 'PENDING' && item.midtrans_token && (
+                                        <button onClick={() => handleLanjutkanBayar(item.midtrans_token)} className="font-medium text-blue-400 hover:underline">
+                                            {t('continuePayment')}
+                                        </button>
+                                    )}
+                                    {(item.status === 'COMPLETED' || item.status === 'PENDING') && (
+                                        <Link to={`/profil/pesanan/${item.kode_transaksi}`} className="font-medium text-green-400 hover:underline">
+                                            {t('viewDetail')}
+                                        </Link>
+                                    )}
+                                    {item.status === 'CANCELED' && (
+                                        <span className="text-gray-500">{t('canceled')}</span>
+                                    )}
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>
